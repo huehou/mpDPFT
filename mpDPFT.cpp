@@ -11185,7 +11185,7 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
         	opt.homotopy = 1;
         	opt.printQ = 1;
         	opt.cma.runs = 1;//(int)POW(2.,aux)*10*opt.D;
-        	opt.cma.generationMax = 20*opt.D;
+        	opt.cma.generationMax = 50*opt.D;
         	opt.cma.popExponent = 0;//(int)(4.*data.RNpos(data.MTGEN));
         	opt.cma.VarianceCheck = opt.D;//10*opt.D;
         	opt.stallCheck = 100*opt.D;

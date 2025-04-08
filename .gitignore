@@ -9,3 +9,25 @@
 !CEC2014_input_data/**
 !Eigen_Headers/**
 
+# Ignore specific files
+AccessWorkStation.sh
+Bialystok.sh
+_Bialystok.sh
+downloadFrom_cqt72.sh
+execute_mpDPFT.sh
+Execute_mpDPFT.sh
+Execute_mpDPFT_nusHPC.sh
+get_remote_WorkStation.sh
+Get_remote_WorkStation.sh
+Launch_tad_scan_local_all_noremotemount.sh
+login_remote_WorkStation.sh
+Login_remote_WorkStation.sh
+mount_Seagate_Primary_Backups.sh
+nusHPC.sh
+retrieve_mpDPFT.sh
+Retrieve_mpDPFT.sh
+submit_mpDPFT.sh
+Submit_mpDPFT.sh
+transfer_remote_Workstation.sh
+Transfer_remote_Workstation.sh
+uploadTo_cqt72.sh

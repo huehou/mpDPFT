@@ -1,0 +1,47 @@
+0			//System			--- 0: default --- 1: Kenkel1991 --- 2: TigerWeb
+0			//Symmetry			--- 0: anisotropic --- 1: isotropic --- 2: uniform --- 3: adaptive grid
+0			//TaskType			--- 0: default (fixed muVec || fixed Abundances) --- 1: Energy surface for S=2 on rectangular muVec grid --- 2: GlobalMinimum{Energy(muVec)} --- 3: GlobalMinimum{Energy(Abundances)} --- 4: AuxilliaryFit --- 5: 2ParameterExploration --- 6: 3ParameterExploration --- 7: 1ParameterExploration --- 8: successive InterpolV (double steps, half maxSCcount) --- 9: Conjugate-/GradientDescent
+0			//TaskParameterCount		--- integer^S for TaskType==1 --- of each parameter for TaskType==5-7 --- number of successions for TaskType==8
+0. 0.			//TaskHyperBox			--- parameter ranges for TaskType==5-7,9
+3			//DIM				--- dimension
+2			//Units				--- {Energy,Length}. 0: default --- 1: {HO units} (with hbar=m=omega=1) --- 2: {eV,Angstrom} (with m=m_e)
+10.			//edge				--- physical edge length of cubic integration grid (centred @origin)
+32			//steps				--- #steps in each cartesian direction
+1			//S				--- #species
+2.			//Abundances			--- S-component vector<double> of target abundances
+1.0e-3			//RelAcc			--- relative target accuracy for Abundances (fixed-mu calculation if <MP)
+0.01			//InternalAcc			--- relative target accuracy for internal calculations; common choices: 0.05(n3pT), 1.0e-6(nAiT), 0.01(n7)
+0			//K				--- #resources 
+0.			//Resources			--- K-component vector<double> of resources [>0.: uniform --- -1.1: prey (first P components) --- -2.2 (-3.3) defined in-code (from file)]
+7			//DensityExpression		--- 1: TF-inspired --- 2: TF-inspired(finite-TVec) --- 3: CoulombKernelT --- 4: toy density with gradients --- 5: nAiT --- 6: n3pFFT --- 7: TF --- 8: TF(finite-TVec) --- 9: n3pT(finite-TVec) --- 10: n3p --- 11: n7
+1.			//mpp				--- vector<double> of multi-purpose parameters for Environments and special preparations
+4. 1. 3. 100. 1. 1.0e-100		//Mpp				--- vector<double> of Multi-purpose parameters for Densities
+1.			//tauVec			--- S-component vector<double> of species-specific dispersal coefficients [tau]=energy*area
+1.			//tVec				--- S-component vector<double> of species-specific territories for GaussKernelT [t]=length
+0.1			//TVec				--- S-component vector<double> of species-specific temperatures; choose 0. for default; [T]=energy
+10			//Environments			--- S-component vector<int> of species-specific environment types [Env]=energy --- 0: flat (<-data.flatEnv) --- 1: isotropic (r^2)^data.rpow with mpp prefactor --- 2: |x| with mpp prefactor for 2D --- 3: anharmonic oscillator --- 4: 2*r^4-3*r^2+3/2 with mpp prefactor for 2D --- 5: customized in-code --- 6: fruit flies quasi-1D chamber --- 7: fruit flies stairs square chamber --- 10: chemistry (<-TabFunc_Nuclei) --- 11-13: TigerWeb --- 14: random --- 15: Morse
+1.			//stretchfactor			--- for separation between loaded nuclei positions
+0.			//Wall				--- replace outer region of Environments with wall (if Wall>0.: r>rW=|Wall|*edge/2 --- if Wall<0.: x>rW || y>rW)
+0.			//Noise				--- 1: add random noise of relative amplitude Noise (to fields specified in-code)
+0			//InterpolVQ			--- 1: initialize effective environment with interpolation from mpDPFT_V.dat" --- 0: initialize with data.Environments
+8 -101 -130		//Interactions			--- vector<int> of accumulative interaction types. 0: noninteracting --- 1: mutually repulsive contact --- 2: Resources --- 3-7 & 16 & 18: various point-like competitive interactions --- 8: Hartree --- 9: renormalized contact --- 10: repulsive contact --- 11: Dirac exchange --- 12: Gombas correlation --- 13: VWN correlation --- 14: DeltaEkin for 2D-3D crossover --- 15: Dipolar interaction in momentum space --- 16: Repulsion+Mutualism --- 17: Dipolar interaction in position space --- 19-21: various Hartree-type interactions
+0.01			//incrementalV			--- fraction of interaction increase per SC iteration, until default(==1.) reached
+-30.			//muVec				--- S-component vector<double> of Lagrange multipliers [mu]=energy
+-2.			//DeltamuModifier		--- parameter for enforcing the constraints (adaptively optimized in-code)
+1. 5. -1.		//Mixer				--- vector<double> of Mixer parameters. [0]: 0.: linear --- 1.: Pulay --- 2.: Pulay2, [1]: Pulay scope, [2] Pulay metric weight (automatic if <0.)
+0.2			//thetaVec			--- S-component vector<double> of species-specific admixtures for self-consistent loop
+1.0e-5			//SCcriterion			--- criterion for breaking self-consistent loop
+100			//maxSCcount			--- maximum number of self-consistent iterations; put 0 for noninteracting systems
+1			//method			--- integration method --- 1: Riemann --- 2: BooleRule
+5			//DelFieldMethod		--- method of differentiation --- 0: one-sided difference --- 1: cubic spline --- 2: monotone cubic spline --- 3: Akima spline --- 4: FFT
+2			//MovieQ			--- 1: Make movie of densities along OutCut
+0			//Schedule			--- modifications during self-consistent loop --- 0: no injections --- 1: one-time injection --- 2: regular injections --- 3: impose noise on densities --- 4: impose noise (0.1->1e-16 at maxSCcount) on densities --- 5: adaptive thetaVec --- 6: impose noise (0.1->1e-19) on densities & decaying gamma (1->1e-18) --- 7: impose noise (0.1->1e-5) on densities --- 8: Fourier filter
+0			//EkinTypes			--- vector<int> of accumulative DispersalEnergies. 0: default for DensityExpression --- 1: TF --- 2: Nabla2(3D) --- 3: vW --- 4: LevyPerdewVirial
+0.			//alpha				--- prefactor for amensalism, omega_z, mu0mu2, etc.
+0.			//beta				--- prefactor for repulsion, RenormalizedContact, etc.
+0.			//gamma				--- prefactor for (contact) parasitism
+14.3996483256249	//gammaH			--- prefactor for (Hartree) repulsion
+2.			//degeneracy			--- spin-multiplicity, etc.
+2 5			//regularize			--- vector<int> of accumulative regularization procedures for Densities
+0.375			//RegularizationThreshold	--- fraction of edge for regularize, DelFieldMethod, etc.
+1			//Print				--- -1: print only essential task output --- 0: print self-consistent iterations only if SCcount<10 or log10(SCcount)==integer --- 1: print all iterations --- 2: add timing information

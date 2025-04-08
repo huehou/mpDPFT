@@ -1,0 +1,15 @@
+0		// --- 1: load PSO parameters below --- 0: don't
+100000  	// Smax; // maximum swarm size
+20	  	// InitialSwarmSize; // Initial number of swarm particles (capped at Smax)  
+5	  	// MaxLinks; // Max number of particles informed by a given one
+0.72135	  	// w; // First confidence coefficient
+1.19315	  	// c; // Second confidence coefficient  
+1.0e-8	  	// epsf; // //absolute tolerance for convergence of objective function
+10	  	// VarianceCheck; //number of PSO loops to take into account for variance check  
+1	  	// elitism; // 1: enable elitism --- 0: don't
+1	  	// avPartQ; // 1: replace worst by average particle --- 0: don't
+0	  	// PostProcessQ; // 1: post-process CurrentBestx with LCO --- 0: don't
+10000	  	// eval_max_init; // maximum number of evaluations for first run
+1.0	  	// increase; // increase swarm size and eval_max in consecutive runs
+2	  	// TargetMinEncounters; // minimum number of runs that encounter the current optimum within epsf
+12	  	// runs; // Numbers of runs

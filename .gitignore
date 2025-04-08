@@ -1,0 +1,11 @@
+# Ignore all folders
+*/
+
+# Allow specific folders (keep the trailing slash)
+!CEC2014_input_data/
+!Eigen_Headers/
+
+# Allow contents inside those folders
+!CEC2014_input_data/**
+!Eigen_Headers/**
+

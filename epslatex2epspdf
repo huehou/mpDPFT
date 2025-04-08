@@ -1,0 +1,63 @@
+#!/usr/bin/perl -w
+use strict;
+
+# might be suitable to replace epslatex2epspdf also for non-wide cases
+my @usagetext=
+ ("\n",
+  "Usage:  epslatex2epspdf input output\n\n",
+  "Conversion of the gnuplot output with terminal epslatex,\n",
+  "input.tex and input.eps, to files output.eps and output.pdf.\n",
+  "which will contain the figure and the text combined.\n",
+  "\n"
+ );
+
+my $tmpdir = 'epslatex2epspdf_tmp'; # subdir of current assumed
+my $tmpfilepre = "combine";
+
+$#ARGV == 1  or die(@usagetext);
+my $inputpre  = $ARGV[0];
+my $outputpre = $ARGV[1];
+
+! system "test -r ${inputpre}.tex -a -r ${inputpre}.eps"
+  or die("Files not found: ${inputpre}.tex or ${inputpre}.eps");
+
+print "\nCopy files...\n\n";
+mkdir "$tmpdir"
+;#  or die("Temporary directory $tmpdir already exists");
+system "cp ${inputpre}.tex ${inputpre}.eps $tmpdir/.";
+chdir "$tmpdir";
+
+print "\nCreate latex file...\n\n";
+open(TEX, '>', "${tmpfilepre}.tex");
+print TEX
+  "\\documentclass{article}\n".
+  "\\usepackage{graphicx}\n".
+  "\\usepackage{color}\n".
+  "\\pagestyle{empty}\n".
+  "\\begin{document}\n".
+  "\\begin{figure}\n".
+  "\\input{${inputpre}.tex}\n".
+  "\\end{figure}\n".
+  "\\end{document}\n\n";
+close TEX;
+
+print "Run latex...\n\n";
+! system "latex -jobname=${outputpre} ${tmpfilepre}.tex" and
+print "\nRun dvips...\n\n" and
+! system "dvips ${outputpre}.dvi" and
+print "\nRun ps2eps...\n\n" and
+! system "ps2eps --clip --loose ${outputpre}.ps" and
+print "\nGenerate pdf...\n\n" and
+! system "cat ${outputpre}.ps | ps2eps --clip --loose | epstopdf --filter > ${outputpre}.pdf" and
+print "\nGenerate eps...\n\n" and
+! system "epstopdf ${outputpre}.eps" and
+print "\nCopy files and cleanup...\n\n" and
+chdir ".." and
+! system "cp ${tmpdir}/${outputpre}.eps ." and
+! system "cp ${tmpdir}/${outputpre}.pdf ."
+  or die();
+
+# and !
+system "rm -r ${tmpdir}";
+
+

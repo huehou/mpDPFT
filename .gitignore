@@ -32,4 +32,3 @@ transfer_remote_Workstation.sh
 Transfer_remote_Workstation.sh
 uploadTo_cqt72.sh
 
-git filter-repo --path AccessWorkStation.sh --path AccessWorkStation.sh --path Bialystok.sh --path _Bialystok.sh --path downloadFrom_cqt72.sh --path execute_mpDPFT.sh --path Execute_mpDPFT.sh --path Execute_mpDPFT_nusHPC.sh --path get_remote_WorkStation.sh --path Get_remote_WorkStation.sh --path Launch_tad_scan_local_all_noremotemount.sh --path login_remote_WorkStation.sh --path Login_remote_WorkStation.sh --path mount_Seagate_Primary_Backups.sh --path nusHPC.sh --path retrieve_mpDPFT.sh --path Retrieve_mpDPFT.sh --path submit_mpDPFT.sh --path Submit_mpDPFT.sh --path transfer_remote_Workstation.sh --path Transfer_remote_Workstation.sh --path uploadTo_cqt72.sh --invert-paths --force

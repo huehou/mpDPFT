@@ -12,14 +12,14 @@ This semi-automatic installation (with occasional confirmations in the terminal)
 mpDPFT is a C++ codebase for DPFT simulations of fermionic quantum systems—from quantum gases to electronic structure. The main code executes the selfconsistent DPFT loop for a broad variety of interaction functionals (similar to traditional Kohn--Sham implementations, though with various orbital-free kinetic energy potential functionals). Notable numerical features are multi-species Pulay mixing, FFT derivatives stabilized with convolutions, self-consistent loop implementation with annealing; linked libraries include fftw, alglib, boost, gsl, libxc. The code relies on openMP for parallelization. Some features use MPI and others interact with Python scripts.
 
 **Integrated side projects:**
---- Black-box function optimization via evolutionary algorithms (CMA-ES, particle swarm optimition, genetic algorithm, simulated annealing)
+--- Black-box function optimization via evolutionary algorithms (CMA-ES, particle swarm optimization, genetic algorithm, simulated annealing)
 --- One-particle-exact density functional theory (1pEx-DFT)
 --- Ecosystem modelling (DFTe)
 
 **Notable Applications:**
 --- Trapped ultracold Fermi gases (1D, 2D, 3D, and 2D-to-3D crossover)
---- Electron-hole puddles in 2D materials
 --- Electronic structure from atoms to nanoparticles
+--- Electron-hole puddles in 2D materials
 
 **Lead Developer:** Martin-Isbjörn Trappe
 

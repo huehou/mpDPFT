@@ -14,7 +14,7 @@ mpDPFT is a C++ codebase for DPFT simulations of fermionic quantum systems—fro
 **Integrated side projects:**
 --- Black-box function optimization via evolutionary algorithms (CMA-ES, particle swarm optimization, genetic algorithm, simulated annealing)
 --- One-particle-exact density functional theory (1pEx-DFT)
---- Ecosystem modelling (DFTe)
+--- DFT-based ecosystem modelling (DFTe)
 
 **Notable Applications:**
 --- Trapped ultracold Fermi gases (1D, 2D, 3D, and 2D-to-3D crossover)

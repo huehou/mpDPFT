@@ -1,4 +1,4 @@
-# mpDPFT (multi-purpose Density-Potential Functional Theory)
+# mpDPFT (multi-purpose Density-Potential Functional Theory) v1.0
 **Tested on Ubuntu LTS 16, 18, 20, 22, & 24**
 
 This semi-automatic installation (with occasional confirmations in the terminal) should take less than 30 minutes. Make sure that the items mentioned below are all in place (eventually) by simply executing this README.md as explained in the INSTALLATION section below.

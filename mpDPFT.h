@@ -469,6 +469,7 @@ void testHydrogenicHint(datastruct &data, taskstruct &task);
 void testK1(datastruct &data, taskstruct &task);
 string exec(const char* cmd);
 int testIAMIT(vector<double> &x, datastruct &data, taskstruct &task);
+void testScript(void);
 void fab(vector<vector<double>> &TargetField, int a, int b, datastruct &data, taskstruct &task);
 inline double KDphi(double alpha, double beta, double s){ return alpha*s+POW(beta*s,3)/3.+1./(4.*s); }
 double tweeze_phi(double x, double a, double b, bool left, KDparams &p);

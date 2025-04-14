@@ -24,6 +24,8 @@
 #include <algorithm>
 #include <set>
 #include <omp.h>
+#include <unistd.h>
+#include <libgen.h>
 #include <vector>
 #include <memory>
 #include <stdexcept>
@@ -8704,6 +8706,7 @@ void RunTests(taskstruct &task, datastruct &data){
   //testHydrogenicHint(data,task);
   //testK1(data,task);
   //vector<double> x(12,3.0); testIAMIT(x,data,task);
+  //testScript();
 }
 
 void RunAuxTasks(taskstruct &task, datastruct &data){
@@ -9529,24 +9532,36 @@ void testKD(datastruct &data){
         EndTimer("testKD",data);
   	}
 
-  	//does not run in the background - contrary to intention...
-  	// Absolute path to the folder where the script is located
-  	const char* folder_path = "/home/martintrappe/Desktop/PostDoc/Code/mpDPFT/mpScripts/";
-    // Change the directory and then execute the script
-    std::string command = "cd " + std::string(folder_path) + " && ./mpScript_testKD.sh &";
-    // Call the bash script
-    if (system(command.c_str()) != 0) {
+    // Execute script stored in .../mpScripts/...
+    char exePath[PATH_MAX];// Get path to the current executable
+    ssize_t count = readlink("/proc/self/exe", exePath, PATH_MAX);
+    if (count == -1) {
+        cerr << "QuantumCircuitIA: Could not determine executable path!" << endl;
+    }
+    exePath[count] = '\0';  // Null-terminate
+    string exeDir = dirname(exePath);
+    // Construct path to script (relative to executable directory)
+	string scriptPath = exeDir + "/mpScripts/mpScript_testKD.sh";
+    ostringstream cmd;
+    cmd << scriptPath;
+    if (system(cmd.str().c_str()) != 0) {
       std::cerr << "Error: The script failed to execute properly." << std::endl;
     } else {
       std::cout << "Script executed successfully!" << std::endl;
     }
 
-    //...but this alternative does not work at all
-    // pid_t pid = fork(); // Create a new process (fork)
-    // if (pid == 0) {// Child process: pid == 0
-    //   execl("./home/martintrappe/Desktop/PostDoc/Code/mpDPFT/mpScripts/mpScript_testKD.sh", "mpScript_testKD.sh", nullptr); // Execute the script
-    //   std::cerr << "Failed to execute the script\n"; // Only reached if execl fails
-    // }
+  	// //does not run in the background - contrary to intention...
+  	// // Absolute path to the folder where the script is located
+  	// const char* folder_path = "/home/martintrappe/Desktop/PostDoc/Code/mpDPFT/mpScripts/";
+   //  // Change the directory and then execute the script
+   //  std::string command = "cd " + std::string(folder_path) + " && ./mpScript_testKD.sh &";
+   //  // Call the bash script
+   //  if (system(command.c_str()) != 0) {
+   //    std::cerr << "Error: The script failed to execute properly." << std::endl;
+   //  } else {
+   //    std::cout << "Script executed successfully!" << std::endl;
+   //  }
+
 }
 
 void testFitFunction(const real_1d_array &c, const real_1d_array &x, double &func, void *ptr){// where x is a position on X-axis and c is adjustable parameter
@@ -10411,8 +10426,28 @@ int testIAMIT(vector<double> &x, datastruct &data, taskstruct &task){
     cout << vec_to_str(Sum) << endl;
 
     return 0;
+}
 
+void testScript(void){
+	// Execute script stored in .../mpScripts/...
+    char exePath[PATH_MAX];// Get path to the current executable
+    ssize_t count = readlink("/proc/self/exe", exePath, PATH_MAX);
+    if (count == -1) {
+        cerr << "QuantumCircuitIA: Could not determine executable path!" << endl;
+    }
+    exePath[count] = '\0';  // Null-terminate
+    string exeDir = dirname(exePath);
+    // Construct path to script (relative to executable directory)
+	string scriptPath = exeDir + "/mpScripts/test.sh";
+    ostringstream cmd;
+    cmd << scriptPath;
+    if (system(cmd.str().c_str()) != 0) {
+      std::cerr << "Error: The script failed to execute properly." << std::endl;
+    } else {
+      std::cout << "Script executed successfully!" << std::endl;
+    }
 
+    SleepForever();
 }
 
 // R O U T I N E S    F O R  ---  OPTIMIZATION  ---  MACHINE LEARNING  --- NEURAL NETWORKS
@@ -11171,7 +11206,7 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
       // 		}
     }
     else if(opt.function==201){//Itai Arad's quantum circuit, QuantumCircuitIA
-      	opt.D = 12;
+      	opt.D = 20;
       	opt.SearchSpaceLowerVec.clear(); opt.SearchSpaceLowerVec.resize(opt.D);
       	opt.SearchSpaceUpperVec.clear(); opt.SearchSpaceUpperVec.resize(opt.D);
       	opt.SearchSpaceMin = 0.; opt.SearchSpaceMax = 2.*PI;
@@ -11184,8 +11219,8 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
         	opt.ReportX = true;
         	opt.homotopy = 1;
         	opt.printQ = 1;
-        	opt.cma.runs = 1;//(int)POW(2.,aux)*10*opt.D;
-        	opt.cma.generationMax = 50*opt.D;
+        	opt.cma.runs = 20;//(int)POW(2.,aux)*10*opt.D;
+        	opt.cma.generationMax = 1000;
         	opt.cma.popExponent = 0;//(int)(4.*data.RNpos(data.MTGEN));
         	opt.cma.VarianceCheck = opt.D;//10*opt.D;
         	opt.stallCheck = 100*opt.D;
@@ -11193,8 +11228,8 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
         	opt.cma.PopulationDecayRate = 0.;
         	//opt.cma.PickRandomParamsQ = true;
         	//opt.cma.DelayEigenDecomposition = true;
-        	opt.cma.elitism = true;
-        	opt.cma.WeightScenario = 2;
+        	//opt.cma.elitism = true;
+        	opt.cma.WeightScenario = 2;//1;//
         	opt.cma.Constraints = 0;
             //end adjust parameters
         	CMA(opt);

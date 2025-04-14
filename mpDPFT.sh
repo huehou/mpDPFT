@@ -15,7 +15,7 @@ rm *.*.new
 rm *Movie*
 rm mpDPFT_OPLenergies.dat
 rm mpDPFT_Den_Cube.dat
-chmod +rwx *.*
+chmod -R u+rwx /home/martintrappe/Desktop/PostDoc/Code/mpDPFT/
 cp /home/martintrappe/Desktop/PostDoc/Code/mpDPFT/mpDPFT.input /home/martintrappe/Desktop/PostDoc/Code/mpDPFT/mpDPFT.tmpinput
 cp /home/martintrappe/Desktop/PostDoc/Code/mpDPFT/mpDPFT.input /home/martintrappe/Desktop/PostDoc/Code/mpDPFT/mpDPFT.originput
 FILE=/home/martintrappe/Desktop/PostDoc/Code/mpDPFT/run$job
@@ -76,8 +76,8 @@ nice -19 ./mpDPFT #option 1; default
 #valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all --track-origins=yes ./mpDPFT
 #valgrind --tool=massif --massif-out-file=massif.out ./mpDPFT
 #make clean
-chmod +rwx *.sh
-chmod +rwx *.* *
+chmod u+rwx *.sh
+chmod u+rwx *.* *
 FILE=/home/martintrappe/Desktop/PostDoc/Code/mpDPFT/run$job/mpDPFT_MovieData.tmp
 if test -f "$FILE"; then
     mkdir Movie
@@ -95,7 +95,7 @@ if test -f "$FILE2"; then
 fi
 ./mpDPFT_Plots.sh
 rm *.eps
-chmod +rwx mpDPFT_CombinedPlots.tex
+chmod u+rwx mpDPFT_CombinedPlots.tex
 pdflatex mpDPFT_CombinedPlots.tex
 rm mpDPFT_CombinedPlots.log
 rm mpDPFT_CombinedPlots.aux
@@ -103,10 +103,11 @@ rm texput.log
 read -r VInterpolIdentifier < "mpDPFT_Aux.dat"
 echo "VInterpolIdentifier=$VInterpolIdentifier" && rm mpDPFT_Aux.dat && TimeStamp="$(date +%Y%m%d_%H%M%S)" && DirectoryName="mpDPFT_$TimeStamp-$VInterpolIdentifier"
 mkdir /home/martintrappe/Desktop/PostDoc/Code/mpDPFT/#DATA/#zips/$DirectoryName/
-cp -r *.cpp *.h *.hpp *.*input Makefile README.md *.sh *.tex epslatex2epspdf *.info *.dat *.pdf *.mp4 *.sty Eigen_Headers CEC2014_input_data /home/martintrappe/Desktop/PostDoc/Code/mpDPFT/#DATA/#zips/$DirectoryName/
+cp -r *.cpp *.h *.hpp *.*input Makefile README.md *.sh *.tex epslatex2epspdf *.info *.dat *.pdf *.mp4 *.sty Eigen_Headers mpScripts CEC2014_input_data /home/martintrappe/Desktop/PostDoc/Code/mpDPFT/#DATA/#zips/$DirectoryName/
 cd /home/martintrappe/Desktop/PostDoc/Code/mpDPFT/#DATA/#zips/$DirectoryName/
 mv mpDPFT.originput mpDPFT.input && mv mpDPFT_V.dat mpDPFT_V_$TimeStamp.dat
-zip -r mpDPFT_SOURCE_$TimeStamp-$VInterpolIdentifier.zip *.cpp *.h *.hpp *.input *.sty TabFunc*.dat epslatex2epspdf Makefile README.md mpDPFT.sh mpDPFTmanualOPTloopBreakQ.dat mpDPFTmanualSCloopBreakQ.dat Eigen_Headers CEC2014_input_data && chmod +rwx *.zip
+echo "confidentiality issue: mpScripts are not added to the #Source_Backups"
+zip -r mpDPFT_SOURCE_$TimeStamp-$VInterpolIdentifier.zip *.cpp *.h *.hpp *.input *.sty TabFunc*.dat epslatex2epspdf Makefile README.md mpDPFT.sh mpDPFTmanualOPTloopBreakQ.dat mpDPFTmanualSCloopBreakQ.dat Eigen_Headers CEC2014_input_data && chmod u+rwx *.zip
 cp mpDPFT_SOURCE_*.zip /home/martintrappe/Desktop/PostDoc/Code/mpDPFT/#Source_Backups
 rm *.zip
 cd /home/martintrappe/Desktop/PostDoc/Code/mpDPFT/run$job/

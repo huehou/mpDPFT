@@ -2583,8 +2583,8 @@ double NYFunction(vector<double> &x, OPTstruct &opt){//new, since 20250205
 double QuantumCircuitIA(vector<double> &x, OPTstruct &opt){
 	double res = 1.0e+300;
 
-	// Get path to the current executable
-    char exePath[PATH_MAX];
+	// Execute Python script stored in .../mpScripts/...
+    char exePath[PATH_MAX];// Get path to the current executable
     ssize_t count = readlink("/proc/self/exe", exePath, PATH_MAX);
     if (count == -1) {
         cerr << "QuantumCircuitIA: Could not determine executable path!" << endl;
@@ -2592,11 +2592,10 @@ double QuantumCircuitIA(vector<double> &x, OPTstruct &opt){
     }
     exePath[count] = '\0';  // Null-terminate
     string exeDir = dirname(exePath);
-
     // Construct path to Python script (relative to executable directory)
     //string scriptPath = exeDir + "/mpScripts/Project_ItaiArad_MIT/noisy-DM-PEPS-sim.py";
-	string scriptPath = exeDir + "/mpScripts/Project_ItaiArad_MIT/noisy_mps_vector_sim.py";
-
+	//string scriptPath = exeDir + "/mpScripts/Project_ItaiArad_MIT/noisy_mps_vector_sim.py";
+	string scriptPath = exeDir + "/mpScripts/Project_ItaiArad_MIT/noisy_mps_vector_sim-Martin.py";
     ostringstream cmd;
     cmd << "python3 " << scriptPath;
 

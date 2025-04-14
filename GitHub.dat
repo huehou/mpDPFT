@@ -1,0 +1,2 @@
+git remote add origin git@github.com:MartinTrappe/mpDPFT.git
+git push -u origin master --force

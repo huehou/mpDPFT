@@ -11206,7 +11206,7 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
       // 		}
     }
     else if(opt.function==201){//Itai Arad's quantum circuit, QuantumCircuitIA
-      	opt.D = 20;
+      	opt.D = 12;
       	opt.SearchSpaceLowerVec.clear(); opt.SearchSpaceLowerVec.resize(opt.D);
       	opt.SearchSpaceUpperVec.clear(); opt.SearchSpaceUpperVec.resize(opt.D);
       	opt.SearchSpaceMin = 0.; opt.SearchSpaceMax = 2.*PI;

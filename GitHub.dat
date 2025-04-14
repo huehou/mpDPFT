@@ -1,2 +1,107 @@
+GitHub Repository: Useful Commands Cheat Sheet
+================================================
+
+BASICS
+------
+
+git status
+    Show changes in working directory (what's staged, unstaged, untracked)
+
+git diff
+    Show unstaged changes (line-by-line diff)
+
+git add <file> / git add .
+    Stage changes (prepare them for commit)
+
+git reset <file>
+    Unstage a file (but keep your changes)
+
+git commit -m "message"
+    Commit staged changes with a message
+
+git push
+    Push commits to GitHub (after upstream is set)
+
+git pull
+    Pull latest changes from GitHub
+
+git log --oneline
+    Compact history view of commits
+
+---
+
+BRANCHING
+---------
+
+git branch
+    List all branches
+
+git branch <name>
+    Create a new branch
+
+git checkout <name>
+    Switch to another branch
+
+git checkout -b <name>
+    Create and switch to a new branch
+
+git merge <branch>
+    Merge another branch into your current one
+
+---
+
+TAGS
+----
+
+git tag
+    List tags
+
+git tag v1.0
+    Create tag v1.0 for current commit
+
+git push origin v1.0
+    Push a tag to GitHub
+
+---
+
+REMOTE SETUP
+------------
+
+git remote -v
+    Show linked GitHub remotes
+
 git remote add origin git@github.com:MartinTrappe/mpDPFT.git
-git push -u origin master --force
+    Link local repo to GitHub
+
+git push -u origin master
+    Push and set upstream (only needed once per branch)
+
+---
+
+FILE TRACKING
+-------------
+
+git rm <file>
+    Delete file and stop tracking it
+
+git rm --cached <file>
+    Stop tracking file but keep it on disk
+
+git ls-files --others --ignored --exclude-standard
+    List ignored (untracked) files
+
+---
+
+SAFETY & CLEANUP
+----------------
+
+git log --all -- <file>
+    Show all commits touching a file
+
+git reset --hard HEAD
+    Undo all local changes (dangerous!)
+
+git clean -fd
+    Remove all untracked files and folders
+
+

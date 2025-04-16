@@ -10,6 +10,7 @@
 !Eigen_Headers/**
 
 # Ignore specific files
+accessWorkStation.sh
 AccessWorkStation.sh
 Bialystok.sh
 _Bialystok.sh

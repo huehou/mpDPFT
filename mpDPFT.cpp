@@ -10592,7 +10592,7 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
 			opt.BreakBadRuns = 1;//0: don't --- 1: only in case of severe violations --- 2: aggressive termination policy
 			SetDefaultCMAparams(opt);
 			opt.cma.runs = opt.threads;
-			opt.cma.popExponent = 5;//population prop to 2^popExponent
+			opt.cma.popExponent = 5.;//population prop to 2^popExponent
 			opt.cma.CheckPopVariance = 0.2;//percentage of best populations to assess for termination criterion
 			opt.cma.PickRandomParamsQ = true;
 			opt.cma.DelayEigenDecomposition = true;
@@ -10715,7 +10715,7 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
         	opt.BreakBadRuns = 1;//0: don't --- 1: only in case of severe violations --- 2: aggressive termination policy
         	SetDefaultCMAparams(opt);
             opt.cma.runs = 1000*opt.D;
-            opt.cma.popExponent = 4;//6;//
+            opt.cma.popExponent = 4.;//6.;//
             opt.cma.VarianceCheck = opt.D;
             //opt.stallCheck = 10*opt.D;
             opt.cma.CheckPopVariance = 0.05;
@@ -10806,7 +10806,7 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
 			opt.BreakBadRuns = 1;//0: don't --- 1: only in case of severe violations --- 2: aggressive termination policy
 			SetDefaultCMAparams(opt);
 			opt.cma.runs = 5*opt.D;
-			opt.cma.popExponent = 7;//population prop to 2^popExponent
+			opt.cma.popExponent = 7.;//population prop to 2^popExponent
 			opt.cma.CheckPopVariance = 0.1;//percentage of best populations to assess for termination criterion
 			opt.cma.DelayEigenDecomposition = true;
 			opt.cma.elitism = true;
@@ -10853,7 +10853,7 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
 			SetDefaultCMAparams(opt);
             opt.printQ = 1;
 			opt.cma.runs = 20*opt.D;//10*opt.D;//5*opt.D;//   /* overkill//14 digits accuracy//10 digits accuracy// */
-			opt.cma.popExponent = 7;//6;//5;//
+			opt.cma.popExponent = 7.;//6.;//5.;//
 			opt.cma.VarianceCheck = 20*opt.D;//10*opt.D;//5*opt.D;//
 			opt.stallCheck = 100*opt.D;
 			opt.cma.CheckPopVariance = 0.5;
@@ -10902,7 +10902,7 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
         SetDefaultCMAparams(opt);
         opt.printQ = 1;
         opt.cma.runs = 100*opt.D;
-        opt.cma.popExponent = 5;
+        opt.cma.popExponent = 5.;
         opt.cma.VarianceCheck = 10*opt.D;
         opt.stallCheck = 100*opt.D;
         opt.cma.CheckPopVariance = 0.1;
@@ -10951,7 +10951,7 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
         SetDefaultCMAparams(opt);
         opt.printQ = 1;
         opt.cma.runs = 100*opt.D;
-        opt.cma.popExponent = 5;
+        opt.cma.popExponent = 5.;
         opt.cma.VarianceCheck = 10*opt.D;
         opt.stallCheck = 100*opt.D;
         opt.cma.CheckPopVariance = 0.1;
@@ -11012,7 +11012,7 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
         	opt.printQ = 1;
         	opt.cma.runs = (int)POW(2.,aux)*10*opt.D/opt.inflate;
         	opt.cma.generationMax = 1000*opt.D;
-        	opt.cma.popExponent = (int)(4.*data.RNpos(data.MTGEN));
+        	opt.cma.popExponent = 4.*data.RNpos(data.MTGEN);
         	opt.cma.VarianceCheck = 10*opt.D/opt.inflate;
         	opt.stallCheck = 100*opt.D/opt.inflate;
         	opt.cma.CheckPopVariance = 0.1;
@@ -11152,7 +11152,7 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
         SetDefaultCMAparams(opt);
         opt.printQ = -2;
         opt.cma.runs = 20*opt.D;//10*opt.D;//5*opt.D;//   /* overkill//14 digits accuracy//10 digits accuracy// */
-        opt.cma.popExponent = 7;//6;//5;//
+        opt.cma.popExponent = 7.;//6.;//5.;//
         opt.cma.VarianceCheck = 20*opt.D;//10*opt.D;//5*opt.D;//
         opt.stallCheck = 100*opt.D;
         opt.cma.CheckPopVariance = 0.5;
@@ -11206,29 +11206,55 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
       // 		}
     }
     else if(opt.function==201){//Itai Arad's quantum circuit, QuantumCircuitIA
-      	opt.D = 12;
+      	opt.D = 20;//2*L, cf. noisy-DM-PEPS-sim.py, noisy_mps_vector_sim-Martin.py and noisy_mps_vector_sim-Martin-final.py
       	opt.SearchSpaceLowerVec.clear(); opt.SearchSpaceLowerVec.resize(opt.D);
       	opt.SearchSpaceUpperVec.clear(); opt.SearchSpaceUpperVec.resize(opt.D);
       	opt.SearchSpaceMin = 0.; opt.SearchSpaceMax = 2.*PI;
 
-      	if(opt_ID==106){//CMA
+        if(opt_ID==101){//PSO
+        	SetDefaultPSOparams(opt);
+        	//begin adjust parameters
+        	opt.pso.epsf = 1.0e-6;
+        	opt.pso.runs = opt.D;
+        	opt.pso.increase = 10.;
+        	opt.pso.SwarmDecayRate = 1.7;
+        	opt.pso.InitialSwarmSize = opt.D;
+        	InitializeSwarmSizeDependentVariables(opt.pso.InitialSwarmSize,opt);
+        	opt.pso.VarianceCheck = opt.D;
+        	opt.pso.loopMax = 1500;
+        	opt.pso.CoefficientDistribution = 5; opt.pso.AbsAcc = 0.01;
+        	opt.pso.TargetMinEncounters = opt.pso.runs;
+        	//end adjust parameters
+        	PSO(opt);
+        	paretofront.push_back(opt.nb_eval);
+        	paretofront.push_back(opt.pso.bestf);
+        	paretofront.insert(paretofront.end(), opt.pso.bestx.begin(), opt.pso.bestx.end());
+            // vector<double> Finalf(opt.pso.runs);
+            // #pragma omp parallel for schedule(static) if(data.ompThreads>1)
+            // for(int p=0;p<opt.pso.Finalx.size();p++) Finalf[p] = QuantumCircuitIA(opt.pso.Finalx[p],true,opt);
+            // sort(Finalf.begin(),Finalf.end());
+            // TASKPRINT("QuantumCircuitIA Final f list: " + vec_to_str_with_precision(Finalf,16),task,1);
+      	}
+
+      	else if(opt_ID==106){//CMA
         	SetDefaultCMAparams(opt);
             //begin adjust parameters
             opt.epsf = 1.0e-14;
-        	opt.BreakBadRuns = 1;
+        	opt.BreakBadRuns = 2;
         	opt.ReportX = true;
-        	opt.homotopy = 1;
+        	opt.homotopy = 0;
         	opt.printQ = 1;
         	opt.cma.runs = 20;//(int)POW(2.,aux)*10*opt.D;
-        	opt.cma.generationMax = 1000;
-        	opt.cma.popExponent = 0;//(int)(4.*data.RNpos(data.MTGEN));
-        	opt.cma.VarianceCheck = opt.D;//10*opt.D;
-        	opt.stallCheck = 100*opt.D;
-        	opt.cma.CheckPopVariance = 0.5;
-        	opt.cma.PopulationDecayRate = 0.;
+            opt.cma.ResetSchedule = -1;
+            opt.cma.generationMax = 500;//10000;//
+        	opt.cma.popExponent = 0.5;
+        	opt.cma.VarianceCheck = 10*opt.D;
+        	opt.stallCheck = 10*opt.D;
+        	opt.cma.CheckPopVariance = max(3./opt.cma.runs,3./20.);
+        	opt.cma.PopulationDecayRate = 3.;
         	//opt.cma.PickRandomParamsQ = true;
         	//opt.cma.DelayEigenDecomposition = true;
-        	//opt.cma.elitism = true;
+            opt.cma.elitism = true;
         	opt.cma.WeightScenario = 2;//1;//
         	opt.cma.Constraints = 0;
             //end adjust parameters
@@ -11236,6 +11262,12 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
         	paretofront.push_back(opt.nb_eval);
         	paretofront.push_back(opt.currentBestf);
         	paretofront.insert(paretofront.end(), opt.currentBestx.begin(), opt.currentBestx.end());
+            // vector<double> Finalf(opt.cma.runs);
+            // #pragma omp parallel for schedule(static) if(data.ompThreads>1)
+            // for(int p=0;p<opt.cma.runs;p++) Finalf[p] = QuantumCircuitIA(opt.cma.pop[p][0],true,opt);
+            // sort(Finalf.begin(),Finalf.end());
+            // TASKPRINT("QuantumCircuitIA Final f list: " + vec_to_str_with_precision(Finalf,16),task,1);
+
       	}
     }
 	else if(opt.function==300){//Rastrigin constrained on polytope
@@ -11293,7 +11325,7 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
         opt.printQ = 1;
         opt.cma.runs = (10-2*aux)*opt.D;
         //opt.cma.generationMax = 1000*opt.D;
-        opt.cma.popExponent = (int)(0.3*(double)aux);
+        opt.cma.popExponent = 0.3*(double)aux;
         opt.cma.VarianceCheck = 10*opt.D/opt.inflate;
         opt.stallCheck = 10*opt.D/opt.inflate;//opt.cma.generationMax;//
         opt.cma.CheckPopVariance = 0.1;

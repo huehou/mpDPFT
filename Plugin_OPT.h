@@ -130,7 +130,7 @@ struct CMAstruct
 	int generationMax;
 	int InitialPopulationSize;
 	int NewPopulationSize;
-	int popExponent;
+	double popExponent;
 	double PopulationDecayRate;
 	bool PickRandomParamsQ = false;
 	bool DelayEigenDecomposition = false;
@@ -148,6 +148,7 @@ struct CMAstruct
 	int bestp = 0;
 	vector<double> bestfVec;
 	vector<double> worstfVec;
+    vector<double> bestfVecSorted;
 	vector<vector<double>> bestxVec;
 	int populationSize;
 	vector<vector<double>> mean;
@@ -171,6 +172,10 @@ struct CMAstruct
 	double cmu;
 	double c1;
 	vector<double> cm;
+    double alphamu;
+    double alphamueff;
+    double alphaposdef;
+    double NegWeightSum;
 	vector<double> stepSize;
 	double InitStepSizeFactor;
 	vector<int> EVDcount;//counter of eigenvalue decompositions
@@ -185,8 +190,11 @@ struct CMAstruct
 	int VarianceCheck;
 	vector<vector<double>> history;
 	double ExpectedValue;
-	double alphacov;
+	double alphac;
+    double alphacov;
 	vector<vector<double>> InitBias;
+    int ResetSchedule;
+    vector<int> popRanking;
 };
 
 struct GAOstruct//MIT
@@ -370,6 +378,7 @@ struct PSOstruct//MIT
   vector<int> besthistory;
   vector<double> loopcounthistory;
   vector<double> besthistoryf;
+  vector<vector<double>> Finalx;
 };
 
 struct CGDstruct//MIT
@@ -559,7 +568,12 @@ void SetDefaultCMAparams(OPTstruct &opt);
 void InitializePopulationSizeCMA(OPTstruct &opt);
 void CMA(OPTstruct &opt);
 void InitializeCMA(OPTstruct &opt);
+inline double ccCMA(int p, OPTstruct &opt){//Hansen2016_Eq.(61) with hyperparameter betac<=1
+  return (opt.cma.alphac+pow(opt.cma.mueff/((double)opt.D),opt.cma.betac[p])) / (pow((double)opt.D,opt.cma.betac[p])+opt.cma.alphac+2.*pow(opt.cma.mueff/((double)opt.D),opt.cma.betac[p]));
+}
 void PickParamsCMA(OPTstruct &opt);
+void pickParamsCMA(int p, OPTstruct &opt);
+void UpdatePopulationSizeWeightParametersCMA(OPTstruct &opt);
 void SampleCMA(OPTstruct &opt);
 void SampleMultivariateNormalCMA(int p, OPTstruct &opt);
 inline bool CheckBoxConstraintViolationCMA(double test, int d, OPTstruct &opt){ if(test < opt.SearchSpace[d][0] || test > opt.SearchSpace[d][1]) return true; else return false; }
@@ -573,6 +587,8 @@ void UpdateCovarianceCMA(OPTstruct &opt);
 MatrixXd GetInvSqrt(MatrixXd &A, int p, bool validate, bool &terminateQ, OPTstruct &opt);
 void UpdateStepSizeCMA(OPTstruct &opt);
 void UpdateCMA(OPTstruct &opt);
+void ResetCMA(OPTstruct &opt);
+void resetCMA(int p, OPTstruct &opt);
 
 void GetECIC(vector<double> &EC, vector<double> &IC, vector<double> &x, OPTstruct &opt);
 double GetPenalty(int p, vector<double> &x, OPTstruct &opt);
@@ -587,7 +603,7 @@ double UnconstrainedRana(vector<double> &x, OPTstruct &opt);
 double UnconstrainedEggholder(vector<double> &x, OPTstruct &opt);
 double MutuallyUnbiasedBases(vector<double> &x, OPTstruct &opt);
 double NYFunction(vector<double> &x, OPTstruct &opt);
-double QuantumCircuitIA(vector<double> &x, OPTstruct &opt);
+double QuantumCircuitIA(vector<double> &x, bool finalQ, OPTstruct &opt);
 vector<double> SampleFromSphere(OPTstruct &opt);
 vector<double> PostProcessNYFunction(double f, OPTstruct &opt);
 double DFTe_QPot(vector<double> &x, OPTstruct &opt);

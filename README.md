@@ -9,32 +9,57 @@ This semi-automatic installation (with occasional confirmations in the terminal)
 
 ## OVERVIEW
 
-mpDPFT is a C++ codebase for DPFT simulations of fermionic quantum systems—from quantum gases to electronic structure. The main code executes the selfconsistent DPFT loop for a broad variety of interaction functionals (similar to traditional Kohn--Sham implementations, though with various orbital-free kinetic energy potential functionals). Notable numerical features are multi-species Pulay mixing, FFT derivatives stabilized with convolutions, self-consistent loop implementation with annealing; linked libraries include fftw, alglib, boost, gsl, libxc. The code relies on openMP for parallelization. Some features use MPI and others interact with Python scripts.
+mpDPFT is a C++ codebase for DPFT simulations of fermionic quantum systems—from quantum gases to electronic structure. The main code executes the selfconsistent DPFT loop for a broad variety of interaction functionals (similar to traditional Kohn--Sham implementations, though with various orbital-free kinetic energy *potential* functionals). Notable numerical features are multi-species Pulay mixing, FFT derivatives stabilized with convolutions, self-consistent loop implementation with annealing; linked libraries include fftw, alglib, boost, gsl, libxc. The code relies on openMP for parallelization. Some features use MPI and others interact with Python scripts.
 
 **Integrated side projects:**
---- Black-box function optimization via evolutionary algorithms (CMA-ES, particle swarm optimization, genetic algorithm, simulated annealing)
---- One-particle-exact density functional theory (1pEx-DFT)
---- DFT-based ecosystem modelling (DFTe)
+
+- Black-box function optimization via evolutionary algorithms (CMA-ES, particle swarm optimization, genetic algorithm, coupled simulated annealing)
+- One-particle-exact density functional theory (1pEx-DFT)
+- DFT-based ecosystem modelling (DFTe)
 
 **Notable Applications:**
---- Trapped ultracold Fermi gases (1D, 2D, 3D, and 2D-to-3D crossover)
---- Electronic structure from atoms to nanoparticles
---- Electron-hole puddles in 2D materials
+
+- Trapped ultracold Fermi gases (1D, 2D, 3D, and 2D-to-3D crossover)
+- Electronic structure from atoms to nanoparticles
+- Electron-hole puddles in 2D materials
 
 **Lead Developer:** Martin-Isbjörn Trappe
 
-**Contributors:** Jun Hao Hue, Thanh Tri Chau, Jonathan Wei Zhong Lau, Mikołaj Paraniak, Michael Tsesmelis
+**Core Contributors (co-authors):**
+Jun Hao Hue, Michael Tsesmelis
+
+**Additional Contributors:**
+Thanh Tri Chau, Jonathan Wei Zhong Lau, Mikołaj Paraniak
 
 **Related Publications:** The following publications contain material produced with mpDPFT (or its predecessors) and document the development of mpDPFT
---- [Unsupervised state learning from pairs of states](https://arxiv.org/abs/2007.05308)
---- [Phase separation of a repulsive two-component Fermi gas](https://journals.aps.org/pra/abstract/10.1103/PhysRevA.110.023325)
---- [Atoms, dimers, and nanoparticles from orbital-free DPFT](https://link.aps.org/doi/10.1103/PhysRevA.108.062802)
---- [Single-particle-exact density functional theory](https://doi.org/10.1016/j.aop.2023.169497)
---- [A density functional theory for ecology across scales](https://doi.org/10.1038/s41467-023-36628-4)
---- [Density-potential functional theory for fermions in one dimension](https://doi.org/10.1142/9789811272158_fmatter)
---- [Phase Transitions of Repulsive Two-Component Fermi Gases in Two Dimensions](https://doi.org/10.1088/1367-2630/ac2b51)
---- [First-principles quantum corrections for carrier correlations in double-layer two-dimensional heterostructures](https://doi.org/10.1103/PhysRevB.99.235415)
---- [Systematic corrections to the Thomas--Fermi approximation without a gradient expansion](https://doi.org/10.1088/1367-2630/aacde1)
+
+- [Unsupervised state learning from pairs of states](https://arxiv.org/abs/2007.05308)
+- [Phase separation of a repulsive two-component Fermi gas](https://journals.aps.org/pra/abstract/10.1103/PhysRevA.110.023325)
+- [Atoms, dimers, and nanoparticles from orbital-free DPFT](https://link.aps.org/doi/10.1103/PhysRevA.108.062802)
+- [Single-particle-exact density functional theory](https://doi.org/10.1016/j.aop.2023.169497)
+- [A density functional theory for ecology across scales](https://doi.org/10.1038/s41467-023-36628-4)
+- [Density-potential functional theory for fermions in one dimension](https://doi.org/10.1142/9789811272158_fmatter)
+- [Phase Transitions of Repulsive Two-Component Fermi Gases in Two Dimensions](https://doi.org/10.1088/1367-2630/ac2b51)
+- [First-principles quantum corrections for carrier correlations in double-layer two-dimensional heterostructures](https://doi.org/10.1103/PhysRevB.99.235415)
+- [Systematic corrections to the Thomas--Fermi approximation without a gradient expansion](https://doi.org/10.1088/1367-2630/aacde1)
+
+
+---
+
+
+## Ownership and Usage Terms
+
+This codebase is jointly owned by:
+
+- Martin-Isbjörn Trappe (primary author)
+- Jun Hao Hue
+- Michael Tsesmelis
+
+All rights are reserved. This repository is provided for reference only.
+
+No part of this code may be used, modified, distributed, published, or incorporated into academic publications or commercial products **without the explicit written permission of the owners**.
+
+For usage inquiries, please contact: **martin.trappe@quantumlah.org**
 
 
 ---
@@ -86,11 +111,16 @@ Before installation, note these additional instructions (for post-installation):
 
   - Option 1: Manual installation. Follow the commands line by line in the section BASH INSTALLER below.
 
-  - Option 2: Semi-automatic installation. Paste and execute the following command (for changing shell to bash, creating mpDPFT installer, and executing the installer) into the terminal [[from here onward, the installer (install_mpDPFT.sh) will guide you through the installation; some alternative options for installation are commented out in the BASH INSTALLER section below - simply adjust as you see fit. You will be asked for a destination directory (YOURDIRECTORY) of your choice (e.g., 'mpDPFT' or 'Desktop/mpDPFT'), which is relative to the path of this README.md, i.e., relative to $(pwd)]]:
-  `sudo chsh -s /bin/bash && cp README.md install_mpDPFT.sh && tail -n +100 "install_mpDPFT.sh" > "install_mpDPFT.tmp" && mv "install_mpDPFT.tmp" "install_mpDPFT.sh" && chmod +rwx install_mpDPFT.sh && ./install_mpDPFT.sh`
+  - Option 2: Semi-automatic installation. Paste and execute the following command (for changing shell to bash, creating mpDPFT installer, and executing the installer) into the terminal [[from here onward, the installer (install_mpDPFT.sh) will guide you through the installation; some alternative options for installation are commented out in the BASH INSTALLER section below (starting with the line read -p "Enter...) - simply adjust as you see fit. You will be asked for a destination directory (YOURDIRECTORY) of your choice (e.g., 'mpDPFT' or 'Desktop/mpDPFT'), which is relative to the path of this README.md, i.e., relative to $(pwd)]]:
+  `sudo chsh -s /bin/bash && cp README.md install_mpDPFT.sh && tail -n +130 "install_mpDPFT.sh" > "install_mpDPFT.tmp" && mv "install_mpDPFT.tmp" "install_mpDPFT.sh" && chmod +rwx install_mpDPFT.sh && ./install_mpDPFT.sh`
 
 
 ---
+
+
+
+
+
 
 
 

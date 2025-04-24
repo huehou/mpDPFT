@@ -331,7 +331,7 @@ void InitializeCMA(OPTstruct &opt){
 	OPTprint("       homotopy                          = " + to_string(opt.homotopy),opt);
 	OPTprint("       BreakBadRuns                      = " + to_string(opt.BreakBadRuns),opt);
 	OPTprint("       ReportX                           = " + to_string(opt.ReportX),opt);
-	OPTprint("       epsf                              = " + to_string(opt.epsf),opt);
+	OPTprint("       epsf                              = " + to_string_with_precision(opt.epsf,4),opt);
 	OPTprint("       printQ                            = " + to_string(opt.printQ),opt);
 	OPTprint("       stallCheck                        = " + to_string(opt.stallCheck),opt);
 	OPTprint(" ----- CMA hyperparameters (user) ----- ",opt);

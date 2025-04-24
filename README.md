@@ -57,7 +57,7 @@ This codebase is jointly owned by:
 
 All rights are reserved. This repository is provided for reference only.
 
-No part of this code may be used, modified, distributed, published, or incorporated into academic publications or commercial products **without the explicit written permission of the owners**.
+No part of this code may be used, modified, distributed, published, or incorporated into academic publications or commercial products without the explicit written permission of the owners.
 
 For usage inquiries, please contact: **martin.trappe@quantumlah.org**
 

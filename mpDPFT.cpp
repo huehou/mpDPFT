@@ -11206,7 +11206,7 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
       // 		}
     }
     else if(opt.function==201){//Itai Arad's quantum circuit, QuantumCircuitIA
-      	opt.D = 20;//2*L, cf. noisy-DM-PEPS-sim.py, noisy_mps_vector_sim-Martin.py and noisy_mps_vector_sim-Martin-final.py
+      	opt.D = 12;//2*L, cf. noisy-DM-PEPS-sim.py, noisy_mps_vector_sim-Martin.py and noisy_mps_vector_sim-Martin-final.py
       	opt.SearchSpaceLowerVec.clear(); opt.SearchSpaceLowerVec.resize(opt.D);
       	opt.SearchSpaceUpperVec.clear(); opt.SearchSpaceUpperVec.resize(opt.D);
       	opt.SearchSpaceMin = 0.; opt.SearchSpaceMax = 2.*PI;
@@ -11242,16 +11242,17 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
             opt.epsf = 1.0e-14;
         	opt.BreakBadRuns = 2;
         	opt.ReportX = true;
-        	opt.homotopy = 0;
+        	opt.homotopy = 1;
         	opt.printQ = 1;
         	opt.cma.runs = 20;//(int)POW(2.,aux)*10*opt.D;
             opt.cma.ResetSchedule = -1;
-            opt.cma.generationMax = 500;//10000;//
-        	opt.cma.popExponent = 0.5;
+            opt.cma.generationMax = 1000;//10000;//
+        	opt.cma.popExponent = -1.;
         	opt.cma.VarianceCheck = 10*opt.D;
         	opt.stallCheck = 10*opt.D;
         	opt.cma.CheckPopVariance = max(3./opt.cma.runs,3./20.);
         	opt.cma.PopulationDecayRate = 3.;
+            opt.cma.InitStepSizeFactor = 0.9;//
         	//opt.cma.PickRandomParamsQ = true;
         	//opt.cma.DelayEigenDecomposition = true;
             opt.cma.elitism = true;

@@ -305,6 +305,12 @@ void Gets1s2(double phi, double s0, double A, double Bcube, double thirdBcube, d
   }  
 }
 
+double KD_Contour(int D, double A, double B, KDintegrationParams &KDip){
+    KDip.IntegrationArraySize = 10000;
+    KDip.minB = 0.01;
+    return KD_contour(D, A, B, KDip);
+}
+
 double KD(int D, double A, double B, double &abserr, double reltolx, KDintegrationParams &KDip) {
   
   //MIT20200914: introduce additional USERINPUT accuracy variables:
@@ -326,11 +332,8 @@ double KD(int D, double A, double B, double &abserr, double reltolx, KDintegrati
   // int stepM = 10*KDip.stepM;//integration range for first estimation; default=1000
 
   	//Alex' and Michael's contour integral
-  	if(KDip.contourQ){
-        KDip.IntegrationArraySize = 10000;
-        KDip.minB = 0.01;
-      	return KD_contour(D, A, B, KDip);
-	}
+
+
   
 
     if (B < minB) {//B too small, approximate by sqrt(A_+)^D * J_D(sqrt(A_+))
@@ -400,6 +403,7 @@ double KD(int D, double A, double B, double &abserr, double reltolx, KDintegrati
                 abserr = -1.;
                 return KDapr(D,A,B);
             }
+            if(KDip.contourQ) return KD_Contour(D, A, B, KDip);
             K = (int)(ABS(phi0p)/dd);
             int iMax = max(0,K);
             if(K>0){
@@ -424,6 +428,7 @@ double KD(int D, double A, double B, double &abserr, double reltolx, KDintegrati
 
         }
         else{
+            if(KDip.contourQ) return KD_Contour(D, A, B, KDip);
             if(D==1) res = sin(phi0p) - phi0p * cos(phi0p);
             else if(D==2) res = (-2.*(sin(phi0p) - phi0p * cos(phi0p))+sin(phi0p)*(phi0p*phi0p-0.5*A));
             else if(D==3) res = (-6.*(sin(phi0p) - phi0p * cos(phi0p))+3.*sin(phi0p)*(phi0p*phi0p-0.25*A)-cos(phi0p)*(pow(phi0p,3.)-0.75*A*phi0p));

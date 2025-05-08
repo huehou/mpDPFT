@@ -42,6 +42,7 @@ bool is_close(double a, double b, double atol = 1.e-8);
 double fcontour(double u, void *params);
 double fcontour_gaussian(double u, void *params);
 double KD_contour(int D, double A, double B, KDintegrationParams &KDip);
+double KD_Contour(int D, double A, double B, KDintegrationParams &KDip);
 std::tuple<double, double, double, double> run_contour(int D, double A, double B, std::vector<double> &fc);
 void writeVectorsToFile(const std::vector<double>& vec1, const std::vector<double>& vec2, const std::vector<double>& vec3, const std::vector<double>& vec4, const std::vector<double>& vec5, const std::vector<std::vector<double>> mat, const std::string& filename);
 double log_uniform(double min, double max, std::mt19937& gen);

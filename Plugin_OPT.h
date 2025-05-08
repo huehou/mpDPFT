@@ -195,6 +195,7 @@ struct CMAstruct
 	vector<vector<double>> InitBias;
     int ResetSchedule;
     vector<int> popRanking;
+    double CrossTalk;
 };
 
 struct GAOstruct//MIT
@@ -531,6 +532,9 @@ struct OPTstruct//MIT
   double lowerBound;
   double upperBound;
   int homotopy = 0;
+  double DivideAndConquer = 0.;//~0(no divisions)...100(quickly towards block size of 1)
+  vector<int> FrozenVarsMask;
+  int NumFrozenVars = -1;
 };
 
 void CGD(OPTstruct &opt);
@@ -657,6 +661,8 @@ inline void endTimer(string descriptor, OPTstruct &opt){
 }
 void ShiftRot(vector<double> &x,OPTstruct &opt);
 void ShiftRotInv(vector<double> &z, OPTstruct &opt);
+void Freeze(OPTstruct &opt);
+inline void freeze(vector<double> &x,OPTstruct &opt){ for(int d=0;d<opt.D;d++) if(opt.FrozenVarsMask[d]) x[d] = opt.currentBestx[d]; }
 
 double EqualityConstraintViolation(vector<double> &y, OPTstruct &opt);
 bool EqualityConstraintBoundedVariables(vector<double> &y, OPTstruct &opt);

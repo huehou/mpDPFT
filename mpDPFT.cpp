@@ -8691,7 +8691,7 @@ void RunTests(taskstruct &task, datastruct &data){
   //testBoxBoundaryQ(data);
   //GradientDescent(data);
 /*  getLIBXC(1, 0, -XC_LDA_X, data.libxcPolarization, data); */
-  //testKD(data);
+  testKD(data);
   //test1pEx(data);
   //testALGfit(data);
   //testisfinite();
@@ -9396,6 +9396,8 @@ void testKD(datastruct &data){
     KDip.num_outer_threads = 1;
     KDip.num_inner_threads = data.ompThreads;
 
+
+
   	//BEGIN USER INPUT
   	double scale = 1.0e+6;
     //a,b in [0,1] for A in [-inf,inf] and B in [0,inf]
@@ -9451,6 +9453,10 @@ void testKD(datastruct &data){
     // cout << KD(3,0.,GetKDB(0.001,scale),ABSERR,RELERR,KDip) << endl;
     // EndTimer("K3",data);
     // SleepForever();
+
+    cout << "KD single point: " << KD(1, 16355.26079955373, 12.3106690028169,ABSERR,RELERR,KDip) << endl;
+    KDip.contourQ = true;
+    cout << "KD single point: " << KD(1, 16355.26079955373, 12.3106690028169,ABSERR,RELERR,KDip) << endl;
 
     double a,b,A,B,res,pmin,pmax;
     string FileNameSuffix = "", TimeStamp = YYYYMMDD() + "_" + hhmmss();
@@ -10353,7 +10359,7 @@ void testK1(datastruct &data, taskstruct &task){
 	//END USER INPUT
 	
 	//Production runs
-	GetKD(1, 1.,1., KDparameters, data, task);
+    GetKD(1, 1.,1., KDparameters, data, task);
 	GetKD(1, 1.,2., KDparameters, data, task);
 	GetKD(1, 2.,1., KDparameters, data, task);
 	GetKD(1, 2.,2., KDparameters, data, task);
@@ -11206,7 +11212,7 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
       // 		}
     }
     else if(opt.function==201){//Itai Arad's quantum circuit, QuantumCircuitIA
-      	opt.D = 12;//2*L, cf. noisy-DM-PEPS-sim.py, noisy_mps_vector_sim-Martin.py and noisy_mps_vector_sim-Martin-final.py
+      	opt.D = 20;//2*L, cf. noisy-DM-PEPS-sim.py, noisy_mps_vector_sim-Martin.py and noisy_mps_vector_sim-Martin-final.py
       	opt.SearchSpaceLowerVec.clear(); opt.SearchSpaceLowerVec.resize(opt.D);
       	opt.SearchSpaceUpperVec.clear(); opt.SearchSpaceUpperVec.resize(opt.D);
       	opt.SearchSpaceMin = 0.; opt.SearchSpaceMax = 2.*PI;
@@ -11242,17 +11248,19 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
             opt.epsf = 1.0e-14;
         	opt.BreakBadRuns = 2;
         	opt.ReportX = true;
-        	opt.homotopy = 1;
+        	opt.homotopy = 0;
+            //opt.DivideAndConquer = 3.;
         	opt.printQ = 1;
-        	opt.cma.runs = 20;//(int)POW(2.,aux)*10*opt.D;
-            opt.cma.ResetSchedule = -1;
-            opt.cma.generationMax = 1000;//10000;//
+        	opt.cma.runs = 100;//(int)POW(2.,aux)*10*opt.D;
+            //opt.cma.ResetSchedule = -1;
+            opt.cma.generationMax = 500;//10000;//
         	opt.cma.popExponent = -1.;
-        	opt.cma.VarianceCheck = 10*opt.D;
+        	opt.cma.VarianceCheck = opt.D;//5*opt.D;
         	opt.stallCheck = 10*opt.D;
         	opt.cma.CheckPopVariance = max(3./opt.cma.runs,3./20.);
-        	opt.cma.PopulationDecayRate = 3.;
-            opt.cma.InitStepSizeFactor = 0.9;//
+        	opt.cma.PopulationDecayRate = 0.;
+            opt.cma.CrossTalk = 0.05;
+            //opt.cma.InitStepSizeFactor = 0.3;
         	//opt.cma.PickRandomParamsQ = true;
         	//opt.cma.DelayEigenDecomposition = true;
             opt.cma.elitism = true;

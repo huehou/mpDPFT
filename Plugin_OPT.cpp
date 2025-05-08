@@ -229,6 +229,7 @@ void SetDefaultCMAparams(OPTstruct &opt){
 	opt.cma.WeightScenario = 2;
 	opt.cma.InitStepSizeFactor = 0.3;
 	opt.cma.ResetSchedule = 0;
+	opt.cma.CrossTalk = 0.;
 	
 	InitializePopulationSizeCMA(opt);
 }
@@ -241,7 +242,7 @@ void InitializePopulationSizeCMA(OPTstruct &opt){
 
 void CMA(OPTstruct &opt){//Hansen2016, appendix A for WeightScenario==2
 	OPTprint("\n ***** Enter CMA() ... *****",opt);
-	InitializeCMA(opt);//(again) after potential manual changes of hyperparameters
+	InitializeCMA(opt);
 	
 	while(!ManualOPTbreakQ(opt)){
 		SampleCMA(opt);
@@ -261,6 +262,7 @@ void InitializeCMA(OPTstruct &opt){
 	Eigen::setNbThreads(1);
 	
 	opt.nb_eval = 0.;
+	if(opt.DivideAndConquer>0.){ opt.FrozenVarsMask.clear(); opt.FrozenVarsMask.resize(opt.D,0); opt.NumFrozenVars = 0; }
 	
 	opt.cma.generation = 1;
 	opt.cma.stall = 0;
@@ -329,6 +331,7 @@ void InitializeCMA(OPTstruct &opt){
 	OPTprint("       search space dimension            = " + to_string(opt.D),opt);
 	OPTprint("       parallel threads                  = " + to_string(opt.threads),opt);
 	OPTprint("       homotopy                          = " + to_string(opt.homotopy),opt);
+	OPTprint("       DivideAndConquer                  = " + to_string(opt.DivideAndConquer),opt);
 	OPTprint("       BreakBadRuns                      = " + to_string(opt.BreakBadRuns),opt);
 	OPTprint("       ReportX                           = " + to_string(opt.ReportX),opt);
 	OPTprint("       epsf                              = " + to_string_with_precision(opt.epsf,4),opt);
@@ -344,6 +347,7 @@ void InitializeCMA(OPTstruct &opt){
 	OPTprint("       VarianceCheck                     = " + to_string(opt.cma.VarianceCheck),opt);
 	OPTprint("       PopulationDecayRate               = " + to_string(opt.cma.PopulationDecayRate),opt);
 	OPTprint("       elitism                           = " + to_string(opt.cma.elitism),opt);
+	OPTprint("       CrossTalk                         = " + to_string(opt.cma.CrossTalk),opt);
 	OPTprint("       Constraints                       = " + to_string(opt.cma.Constraints),opt);
 	OPTprint("       DelayEigenDecomposition           = " + to_string(opt.cma.DelayEigenDecomposition),opt);
 	OPTprint("       WeightScenario                    = " + to_string(opt.cma.WeightScenario),opt);
@@ -524,6 +528,8 @@ void SampleCMA(OPTstruct &opt){
 }
 
 void SampleMultivariateNormalCMA(int p, OPTstruct &opt){//sample d-dimensional points around the d-dimensional mean 
+
+	if(opt.cma.generation>1 && opt.RNpos(opt.MTGEN)<opt.cma.CrossTalk) p = opt.cma.bestp;//sample from best population with probability==opt.cma.CrossTalk
 
 	// Sample from standard normal distribution -> the matrix 'Samples' holds d-dimensional vectors in its COLUMNS!
 	MatrixXd Samples(opt.D,opt.cma.populationSize);
@@ -1004,6 +1010,7 @@ void UpdateCMA(OPTstruct &opt){
 	//prepare next generation
 	bool b = UpdateSearchSpace(opt);
 	ResetCMA(opt);
+	Freeze(opt);
 	opt.cma.generation++;
 	for(int p=0;p<opt.cma.runs;p++) opt.cma.penaltyFactor[p] = 1.0e+3 * (double)opt.cma.generation/(double)opt.cma.generationMax * opt.cma.InitPenaltyFactor[p];
 }
@@ -1085,6 +1092,7 @@ void resetCMA(int p, OPTstruct &opt){
 	opt.cma.history[p] = vector<double>(0,0.);
 
 }
+
 
 //************** end MIT CMA main code **************
 
@@ -2334,6 +2342,7 @@ double GetFuncVal( int s, vector<double> &X, int function, OPTstruct &opt ){//Ev
 
 	vector<double> x(X);
 	if(opt.Rand) ShiftRot(x,opt);
+	if(opt.DivideAndConquer>1.0e-12) freeze(x,opt);
 
 	if(function>=-2014+1 && function<=-2014+30){//cec14 test functions, function=-2014+id(cec14), with id(cec14)=1...30
 		vector<double> func(1);
@@ -2406,6 +2415,34 @@ void ShiftRotInv(vector<double> &z, OPTstruct &opt){
 	}
 	vector<double> x(VecDiff(y,opt.RandShift));
 	z = x;
+}
+
+void Freeze(OPTstruct &opt){//opt.DivideAndConquer: 0(no divisions)...100(quickly towards block size of 1)
+	// if(opt.DivideAndConquer>1.0e-12){
+	// 	int NumFrozenVars = 0;
+	// 	if(opt.ActiveOptimizer==106){
+	// 		NumFrozenVars = max(0,min(opt.D-1,(int)((double)opt.D*(1.-exp(-opt.DivideAndConquer*(double)opt.cma.generation/(double)opt.cma.generationMax)))));
+	// 	}
+	// 	if(NumFrozenVars>opt.NumFrozenVars){//update the indices of frozen dimensions
+	// 		opt.NumFrozenVars = NumFrozenVars;
+	// 		for(int d=0;d<opt.D;d++) opt.FrozenVarsMask[d] = 0;
+	// 		while(accumulate(opt.FrozenVarsMask.begin(),opt.FrozenVarsMask.end(),0)<opt.NumFrozenVars) opt.FrozenVarsMask[alea_integer(0,opt.D-1,opt)] = 1;
+	// 		int tmp = opt.printQ;
+	// 		opt.printQ = 2;
+	// 		OPTprint("***** Freeze: NumFrozenVars = " + to_string(opt.NumFrozenVars) + " (FrozenVarsMask = " + vec_to_str(opt.FrozenVarsMask) + ")\n",opt);
+	// 		opt.printQ = tmp;
+	// 	}
+	// }
+	if(opt.DivideAndConquer>1.0e-12){
+		if(opt.ActiveOptimizer==106) opt.NumFrozenVars = max(0,min(opt.D-1,(int)((double)opt.D*(1.-exp(-opt.DivideAndConquer*(double)opt.cma.generation/(double)opt.cma.generationMax)))));
+		//draw the indices of frozen dimensions
+		for(int d=0;d<opt.D;d++) opt.FrozenVarsMask[d] = 0;
+		while(accumulate(opt.FrozenVarsMask.begin(),opt.FrozenVarsMask.end(),0)<opt.NumFrozenVars) opt.FrozenVarsMask[alea_integer(0,opt.D-1,opt)] = 1;
+		int tmp = opt.printQ;
+		opt.printQ = 2;
+		OPTprint("***** Freeze: NumFrozenVars = " + to_string(opt.NumFrozenVars) + " (FrozenVarsMask = " + vec_to_str(opt.FrozenVarsMask) + ")\n",opt);
+		opt.printQ = tmp;
+	}
 }
 
 double EqualityConstraintViolation(vector<double> &y, OPTstruct &opt){
@@ -3366,8 +3403,8 @@ void InitRandomNumGenerator(OPTstruct &opt){
 }
 
 void SetDefaultOPTparams(OPTstruct &opt){
-  InitRandomNumGenerator(opt);
-  opt.timeStamp = YYYYMMDD() + hhmmss();
+  	InitRandomNumGenerator(opt);
+  	opt.timeStamp = YYYYMMDD() + hhmmss();
 }
 
 void RandomizeOptLocation(OPTstruct &opt){

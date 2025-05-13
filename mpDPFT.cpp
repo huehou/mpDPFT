@@ -921,7 +921,7 @@ void InitializeHardCodedParameters(datastruct &data, taskstruct &task){
       	data.txtout << "KD.ReevaluateTriangulation " << data.KD.ReevaluateTriangulation << "\\\\";
       	data.KD.NumChecks = 100;//1: minimum (centroid) --- >1: more points to check in GoodTriangleQ. Discard triangles that do not pass NumChecks
       	data.txtout << "KD.NumChecks " << data.KD.NumChecks << "\\\\";
-      	int FocalDensitySteps = data.steps/4;//data.steps;//min(512,data.steps);//determines grid size for density n7 (should be less than data.steps), will be truncated automatically if necessary, for now only used together with Getn7()-METHOD==3.
+      	int FocalDensitySteps = 96;//data.steps/4;//data.steps;//min(512,data.steps);//determines grid size for density n7 (should be less than data.steps), will be truncated automatically if necessary, for now only used together with Getn7()-METHOD==3.
       	data.txtout << "FocalDensitySteps " << FocalDensitySteps << "\\\\";
       	data.KD.MergerRatioThreshold = 0.1;//minimum percentage of #CurrentMergers to merge good triangles again
       	data.txtout << "KD.MergerRatioThreshold " << data.KD.MergerRatioThreshold << "\\\\";
@@ -4163,7 +4163,7 @@ void Getn7(int s, datastruct &data){
 	KDparameters.distinguishabilityThreshold = 1.0e-14;
 	KDparameters.printQ = 0;
 	KDparameters.CompareKD = true;
-    KDip.contourQ = true;
+    //KDip.contourQ = true;
 	//data.Print = 1;
     double tauThreshold = 1.0e-10;
 	//END USER INPUT
@@ -4369,7 +4369,7 @@ void Getn7(int s, datastruct &data){
 				else tmpfield[j] = GetID(tauThreshold,s,FocalIndex,Norm(rVec),FocalIndex,Norm(rVec),data);
 			}
 			data.Den[s][FocalIndex] = data.degeneracy*Integrate(data.ompThreads,data.method, data.DIM, tmpfield, data.frame);
- 			//PRINT("density[" + to_string(FocalIndex) + "] = " + to_string(data.Den[s][FocalIndex]),data);
+ 			if(omp_get_thread_num()==0) PRINT("density[" + to_string(FocalIndex) + "] = " + to_string(data.Den[s][FocalIndex]),data);
 		}
 	}
   
@@ -6017,6 +6017,7 @@ void ExpandSymmetry(int ExpandDensityQ, vector<double> &Field, datastruct &data)
 		}
 	}
 	else if(data.Symmetry==4 && ExpandDensityQ){
+        PRINT("ExpandDensity...",data);
 		if(data.DIM==1){
 			spline1dinterpolant SPLINE;
 			vector<double> X(data.KD.CoarseGridSize), F(data.KD.CoarseGridSize);
@@ -6035,6 +6036,42 @@ void ExpandSymmetry(int ExpandDensityQ, vector<double> &Field, datastruct &data)
 			//spline1dbuildmonotone(x, f, SPLINE);
 			#pragma omp parallel for schedule(dynamic) if(data.ompThreads>1)
 			for(int i=0;i<data.GridSize;i++) if(!data.SymmetryMask[i]) Field[i] = spline1dcalc(SPLINE,data.VecAt[i][0]);
+		}
+
+		if(data.DIM==2){// Create RBF model for scattered 2D interpolation
+          	string inputFilename = "mpDPFT_ScatterData.dat";
+            string outputFilename = "mpDPFT_rbfInterpolation.dat";
+
+            vector<vector<double>> ScatterData(data.KD.CoarseGridSize);
+			for(int j=0;j<ScatterData.size();j++){
+              	int k = data.KD.CoarseIndices[j];
+              	ScatterData[j].push_back(data.VecAt[k][0]);
+                ScatterData[j].push_back(data.VecAt[k][1]);
+                ScatterData[j].push_back(Field[k]);
+			}
+            MatrixToFile(ScatterData,inputFilename,8);
+
+            // Execute Python script stored in .../mpScripts/...
+    		char exePath[PATH_MAX];// Get path to the current executable
+    		ssize_t count = readlink("/proc/self/exe", exePath, PATH_MAX);
+    		if (count == -1) PRINT("ExpandSymmetry: Could not determine executable path!",data);
+    		exePath[count] = '\0';  // Null-terminate
+    		string exeDir = dirname(exePath);
+    		// Construct Python command for path relative to executable directory
+			string scriptPath = exeDir;
+			scriptPath += "/mpScripts/mpScript_rbf.py";
+    		ostringstream cmd;
+    		cmd << "python3 " << scriptPath << " " << exeDir << "/" << inputFilename << " " << exeDir << "/" << outputFilename << " " << data.EdgeLength;
+
+    		int ret = std::system(cmd.str().c_str());
+			if (ret != 0) PRINT("ExpandSymmetry: Script failed with exit code " + to_string(WEXITSTATUS(ret)),data);
+        	else PRINT("ExpandSymmetry: Script succeeded. Output written to " + outputFilename,data);
+
+            vector<vector<double>> rbfInterpolation = ReadMat(outputFilename);
+
+			#pragma omp parallel for schedule(dynamic) if(data.ompThreads>1)
+			for(int i=0;i<data.GridSize;i++) if(!data.SymmetryMask[i]) Field[i] = rbfInterpolation[i][2];
+
 		}
 	}
 }
@@ -8691,7 +8728,7 @@ void RunTests(taskstruct &task, datastruct &data){
   //testBoxBoundaryQ(data);
   //GradientDescent(data);
 /*  getLIBXC(1, 0, -XC_LDA_X, data.libxcPolarization, data); */
-  testKD(data);
+  //testKD(data);
   //test1pEx(data);
   //testALGfit(data);
   //testisfinite();
@@ -8706,11 +8743,11 @@ void RunTests(taskstruct &task, datastruct &data){
   //testHydrogenicHint(data,task);
   //testK1(data,task);
   //vector<double> x(12,3.0); testIAMIT(x,data,task);
-  //testScript();
+  //RunScript("test.sh");
 }
 
 void RunAuxTasks(taskstruct &task, datastruct &data){
-	ParetoFront(data,task);
+	//ParetoFront(data,task);
 }
 
 
@@ -9538,23 +9575,7 @@ void testKD(datastruct &data){
         EndTimer("testKD",data);
   	}
 
-    // Execute script stored in .../mpScripts/...
-    char exePath[PATH_MAX];// Get path to the current executable
-    ssize_t count = readlink("/proc/self/exe", exePath, PATH_MAX);
-    if (count == -1) {
-        cerr << "QuantumCircuitIA: Could not determine executable path!" << endl;
-    }
-    exePath[count] = '\0';  // Null-terminate
-    string exeDir = dirname(exePath);
-    // Construct path to script (relative to executable directory)
-	string scriptPath = exeDir + "/mpScripts/mpScript_testKD.sh";
-    ostringstream cmd;
-    cmd << scriptPath;
-    if (system(cmd.str().c_str()) != 0) {
-      std::cerr << "Error: The script failed to execute properly." << std::endl;
-    } else {
-      std::cout << "Script executed successfully!" << std::endl;
-    }
+  	RunScript("mpScript_testKD.sh");
 
   	// //does not run in the background - contrary to intention...
   	// // Absolute path to the folder where the script is located
@@ -10434,17 +10455,17 @@ int testIAMIT(vector<double> &x, datastruct &data, taskstruct &task){
     return 0;
 }
 
-void testScript(void){
+void RunScript(string ScriptName){
 	// Execute script stored in .../mpScripts/...
     char exePath[PATH_MAX];// Get path to the current executable
     ssize_t count = readlink("/proc/self/exe", exePath, PATH_MAX);
     if (count == -1) {
-        cerr << "QuantumCircuitIA: Could not determine executable path!" << endl;
+        cerr << "Could not determine executable path!" << endl;
     }
     exePath[count] = '\0';  // Null-terminate
     string exeDir = dirname(exePath);
     // Construct path to script (relative to executable directory)
-	string scriptPath = exeDir + "/mpScripts/test.sh";
+	string scriptPath = exeDir + "/mpScripts/" + ScriptName;
     ostringstream cmd;
     cmd << scriptPath;
     if (system(cmd.str().c_str()) != 0) {
@@ -10452,8 +10473,6 @@ void testScript(void){
     } else {
       std::cout << "Script executed successfully!" << std::endl;
     }
-
-    SleepForever();
 }
 
 // R O U T I N E S    F O R  ---  OPTIMIZATION  ---  MACHINE LEARNING  --- NEURAL NETWORKS
@@ -11254,12 +11273,12 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
         	opt.cma.runs = 100;//(int)POW(2.,aux)*10*opt.D;
             //opt.cma.ResetSchedule = -1;
             opt.cma.generationMax = 500;//10000;//
-        	opt.cma.popExponent = -1.;
+        	opt.cma.popExponent = 1.;
         	opt.cma.VarianceCheck = opt.D;//5*opt.D;
         	opt.stallCheck = 10*opt.D;
         	opt.cma.CheckPopVariance = max(3./opt.cma.runs,3./20.);
         	opt.cma.PopulationDecayRate = 0.;
-            opt.cma.CrossTalk = 0.05;
+            //opt.cma.CrossTalk = 0.02;
             //opt.cma.InitStepSizeFactor = 0.3;
         	//opt.cma.PickRandomParamsQ = true;
         	//opt.cma.DelayEigenDecomposition = true;

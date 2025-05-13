@@ -106,8 +106,8 @@ mkdir /home/martintrappe/Desktop/PostDoc/Code/mpDPFT/#DATA/#zips/$DirectoryName/
 cp -r *.cpp *.h *.hpp *.*input Makefile README.md *.sh *.tex epslatex2epspdf *.info *.dat *.pdf *.mp4 *.sty Eigen_Headers mpScripts CEC2014_input_data /home/martintrappe/Desktop/PostDoc/Code/mpDPFT/#DATA/#zips/$DirectoryName/
 cd /home/martintrappe/Desktop/PostDoc/Code/mpDPFT/#DATA/#zips/$DirectoryName/
 mv mpDPFT.originput mpDPFT.input && mv mpDPFT_V.dat mpDPFT_V_$TimeStamp.dat
-echo "confidentiality issue: mpScripts are not added to the #Source_Backups"
-zip -r mpDPFT_SOURCE_$TimeStamp-$VInterpolIdentifier.zip *.cpp *.h *.hpp *.input *.sty TabFunc*.dat epslatex2epspdf Makefile README.md mpDPFT.sh mpDPFTmanualOPTloopBreakQ.dat mpDPFTmanualSCloopBreakQ.dat Eigen_Headers CEC2014_input_data && chmod u+rwx *.zip
+echo "confidentiality issue: files in mpScripts/Project_ItaiArad_MIT are not added to the #Source_Backups"
+zip -r mpDPFT_SOURCE_$TimeStamp-$VInterpolIdentifier.zip *.cpp *.h *.hpp *.input *.sty TabFunc*.dat epslatex2epspdf Makefile README.md mpDPFT.sh mpDPFTmanualOPTloopBreakQ.dat mpDPFTmanualSCloopBreakQ.dat Eigen_Headers CEC2014_input_data -x "mpScripts/Project_ItaiArad_MIT/*" && chmod u+rwx *.zip
 cp mpDPFT_SOURCE_*.zip /home/martintrappe/Desktop/PostDoc/Code/mpDPFT/#Source_Backups
 rm *.zip
 cd /home/martintrappe/Desktop/PostDoc/Code/mpDPFT/run$job/

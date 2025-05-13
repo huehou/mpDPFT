@@ -9,6 +9,14 @@
 !CEC2014_input_data/**
 !Eigen_Headers/**
 
+# Allow mpScripts/ and all its contents…
+!mpScripts/
+!mpScripts/**
+
+# …but re-ignore the confidential folders inside it
+mpScripts/Project_ItaiArad_MIT/
+mpScripts/Project_ItaiArad_MIT/**
+
 # Ignore specific files
 accessWorkStation.sh
 AccessWorkStation.sh

@@ -8747,7 +8747,7 @@ void RunTests(taskstruct &task, datastruct &data){
 }
 
 void RunAuxTasks(taskstruct &task, datastruct &data){
-	ParetoFront(data,task);
+	//ParetoFront(data,task);
 }
 
 

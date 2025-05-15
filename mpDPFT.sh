@@ -46,11 +46,7 @@ rm TabFunc_Nuclei*.dat
 rm mpDPFT_Den_Cube.dat
 rm mpDPFT_AuxMat*.dat
 cd $ProgramDirectory
-#To recompile ALGLIB and kernel files:
-#cp epslatex2epspdf Makefile *.* $ProgramDirectory/run$job
-#To use precompiled ALGLIB:
-cp *.*input $ProgramDirectory/run$job
-cp -up mpDPFTmain.cpp mpDPFT.cpp mpDPFT.h MPDPFT_HEADER_*.h *.hpp Plugin*.* Makefile README.md *.sh *.tex epslatex2epspdf *.info *.dat $ProgramDirectory/run$job
+cp -up * $ProgramDirectory/run$job
 cp -up -r $ProgramDirectory/Eigen_Headers $ProgramDirectory/run$job
 cp -up -r $ProgramDirectory/CEC2014_input_data $ProgramDirectory/run$job
 cp -up -r $ProgramDirectory/mpScripts $ProgramDirectory/run$job

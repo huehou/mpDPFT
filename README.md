@@ -81,7 +81,6 @@ Before installation, note these additional instructions (for post-installation):
   - Install the following tools for post-processing: `texlive-full`, `gnuplot`, `ffmpeg`, `ps2eps`, `okular`
   - Copy all mpDPFT files and folders into your chosen installation directory (`YOURDIRECTORY`).
   - In `YOURDIRECTORY/mpDPFT.sh`, replace the default directory `DEFAULT_DIR="..."` with your full path `DEFAULT_DIR="$CurrentWorkingDirectory/YOURDIRECTORY"`.
-  - Uncomment the line after `#To recompile ALGLIB` in `mpDPFT.sh` (usually needed only for the first compilation).
   - Optionally, copy `mpDPFT.sh` to your default terminal folder for easy access. You can execute from there whenever you open a new terminal.
   - Copy ALGLIB source files (https://www.alglib.net/download.php) into `YOURDIRECTORY`
   - Copy `placeins.sty` (http://mirrors.ctan.org/macros/latex/contrib/placeins/placeins.sty) into `YOURDIRECTORY`

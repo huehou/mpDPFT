@@ -308,6 +308,14 @@ void Gets1s2(double phi, double s0, double A, double Bcube, double thirdBcube, d
 double KD_Contour(int D, double A, double B, KDintegrationParams &KDip){
     KDip.IntegrationArraySize = 10000;
     KDip.minB = 0.01;
+    //A>100000 || B>100000 || (A>1e5 && B < 1.) || (A < -10 && (std::abs(A) > 100*std::abs(B))) || (A<1 && B >= 1e4)
+
+    KD_contour(1, 120000, 120000, KDip);
+    KD_contour(1, 120000, 0.1, KDip);
+    KD_contour(1, -10000, 12, KDip);
+    KD_contour(1, 0.1, 12000, KDip);
+
+    cin >> A;
     return KD_contour(D, A, B, KDip);
 }
 
@@ -567,7 +575,6 @@ bool is_close(double a, double b, double atol) {
     return std::abs(a - b) <= atol;
 }
 
-
 double fcontour(double u, void *params){
     params_t *p = (params_t *)params;  // Cast params to the correct type
 
@@ -700,6 +707,25 @@ double fcontour(double u, void *params){
     //printf("val: %.10f\n", val);
 
     return val;
+}
+
+bool check_gaussian_profile(void *params){
+
+    double stdev = 1.e-3;
+    double peak = fcontour(1, &params);
+    double pi = 3.14159;
+    int n = 2;
+    double stdev_x = 2*stdev;
+
+    double bound = peak/(2*pi*pow(stdev, 2)) * exp(pow(n, 2)/2);
+
+    double fr = fcontour(1 + stdev_x, &params);
+    double fl = fcontour(1 - stdev_x, &params);
+
+    if ((fl < bound) && (fr < bound))
+        return true;
+    else
+        return false;
 }
 
 
@@ -896,8 +922,9 @@ double KD_contour(int D, double A, double B, KDintegrationParams &KDip){
     double x = sqrt(A2+B2);
     int L = 1;
     double result_gaussian;
-    if(A>100000 || B>100000 || (A>1e5 && B < 1.) || (A < -10 && (std::abs(A) > 100*std::abs(B))) || (A<1 && B >= 1e4)){
-        //cout <<  "Gaussian contour" << endl;
+    if(check_gaussian_profile(&params)){
+    //if(A>100000 || B>100000 || (A>1e5 && B < 1.) || (A < -10 && (std::abs(A) > 100*std::abs(B))) || (A<1 && B >= 1e4)){
+        cout <<  "Gaussian contour " << A << " " << B << endl;
         result = fcontour_gaussian(1.000001, &params);
 
     } else {

@@ -4163,7 +4163,7 @@ void Getn7(int s, datastruct &data){
 	KDparameters.distinguishabilityThreshold = 1.0e-14;
 	KDparameters.printQ = 0;
 	KDparameters.CompareKD = true;
-    //KDip.contourQ = true;
+  KDip.contourQ = true;
 	//data.Print = 1;
     double tauThreshold = 1.0e-10;
 	//END USER INPUT

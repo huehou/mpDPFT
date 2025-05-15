@@ -101,7 +101,7 @@ def rbf_interpolate_to_grid(input_filename, output_filename, n):
         # 5. Prepare the output data - Fortran-style flatten
         Xf = X_grid.ravel(order='F')
         Yf = Y_grid.ravel(order='F')
-        Ff = F_interpolated_flat.reshape((ny,nx), order='F').ravel(order='F')
+        Ff = F_interpolated_flat.reshape((n,n), order='F').ravel(order='F')
         output_data = np.column_stack((Xf, Yf, Ff))
 
         # 6. Write to the output file

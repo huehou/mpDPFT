@@ -1,8 +1,20 @@
 #!/bin/bash
+
 #sysbench cpu --cpu-max-prime=20000 --threads=$(nproc) run (check "total number of events" --- CQT_laptop->158189)
 #execute in command line, see README.md
+
 threads=${1:-$(nproc)}
 job=$2
+
+DEFAULT_DIR="$HOME/Desktop/PostDoc/Code/mpDPFT" # Intended default directory
+if [ -d "$DEFAULT_DIR" ]; then
+    ProgramDirectory="$DEFAULT_DIR"
+else
+    ProgramDirectory="$(pwd)" # Fallback: absolute path of the current working directory (location from where mpDPFT.sh is called)
+fi
+ProgramDirectory="$(cd "$ProgramDirectory" && pwd)" # Normalize the path
+echo "Using ProgramDirectory: $ProgramDirectory"
+
 cp *.sh /home/martintrappe/Desktop/PostDoc/Code/mpDPFT/
 cd /home/martintrappe/Desktop/PostDoc/Code/mpDPFT/
 rm *.pdf

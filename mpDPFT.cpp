@@ -921,7 +921,7 @@ void InitializeHardCodedParameters(datastruct &data, taskstruct &task){
       	data.txtout << "KD.ReevaluateTriangulation " << data.KD.ReevaluateTriangulation << "\\\\";
       	data.KD.NumChecks = 100;//1: minimum (centroid) --- >1: more points to check in GoodTriangleQ. Discard triangles that do not pass NumChecks
       	data.txtout << "KD.NumChecks " << data.KD.NumChecks << "\\\\";
-      	int FocalDensitySteps = 96;//data.steps/4;//data.steps;//min(512,data.steps);//determines grid size for density n7 (should be less than data.steps), will be truncated automatically if necessary, for now only used together with Getn7()-METHOD==3.
+      	int FocalDensitySteps = 64;//data.steps/4;//data.steps;//min(512,data.steps);//determines grid size for density n7 (should be less than data.steps), will be truncated automatically if necessary, for now only used together with Getn7()-METHOD==3.
       	data.txtout << "FocalDensitySteps " << FocalDensitySteps << "\\\\";
       	data.KD.MergerRatioThreshold = 0.1;//minimum percentage of #CurrentMergers to merge good triangles again
       	data.txtout << "KD.MergerRatioThreshold " << data.KD.MergerRatioThreshold << "\\\\";
@@ -6065,7 +6065,7 @@ void ExpandSymmetry(int ExpandDensityQ, vector<double> &Field, datastruct &data)
 
     		int ret = std::system(cmd.str().c_str());
 			if (ret != 0) PRINT("ExpandSymmetry: Script failed with exit code " + to_string(WEXITSTATUS(ret)),data);
-        	else PRINT("ExpandSymmetry: Script succeeded. Output written to " + outputFilename,data);
+        	else PRINT("ExpandSymmetry: Script succeeded with output written to " + outputFilename,data);
 
             vector<vector<double>> rbfInterpolation = ReadMat(outputFilename);
 

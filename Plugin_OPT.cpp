@@ -347,6 +347,7 @@ void InitializeCMA(OPTstruct &opt){
 	OPTprint("       VarianceCheck                     = " + to_string(opt.cma.VarianceCheck),opt);
 	OPTprint("       PopulationDecayRate               = " + to_string(opt.cma.PopulationDecayRate),opt);
 	OPTprint("       elitism                           = " + to_string(opt.cma.elitism),opt);
+	OPTprint("       ResetSchedule                     = " + to_string(opt.cma.ResetSchedule),opt);
 	OPTprint("       CrossTalk                         = " + to_string(opt.cma.CrossTalk),opt);
 	OPTprint("       Constraints                       = " + to_string(opt.cma.Constraints),opt);
 	OPTprint("       DelayEigenDecomposition           = " + to_string(opt.cma.DelayEigenDecomposition),opt);

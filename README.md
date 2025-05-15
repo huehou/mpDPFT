@@ -1,7 +1,7 @@
 # mpDPFT (multi-purpose Density-Potential Functional Theory)
 **Tested on Ubuntu LTS 16, 18, 20, 22, & 24**
 
-This semi-automatic installation (with occasional confirmations in the terminal) should take less than 30 minutes. Make sure that the items mentioned below are all in place (eventually) by simply executing this README.md as explained in the INSTALLATION section below.
+This semi-automatic installation (with occasional confirmations in the terminal) should take less than 30 minutes. Make sure that the items mentioned below are all in place (eventually) by simply executing this `README.md` as explained in the INSTALLATION section below.
 
 
 ---
@@ -80,19 +80,19 @@ Before installation, note these additional instructions (for post-installation):
   - Restart your computer.
   - Install the following tools for post-processing: `texlive-full`, `gnuplot`, `ffmpeg`, `ps2eps`, `okular`
   - Copy all mpDPFT files and folders into your chosen installation directory (`YOURDIRECTORY`).
-  - In `YOURDIRECTORY/mpDPFT.sh`, replace all instances of `/home/martintrappe/Desktop/PostDoc/Code/mpDPFT` with the full path: `$CurrentWorkingDirectory/$YOURDIRECTORY`.
+  - In `YOURDIRECTORY/mpDPFT.sh`, replace the default directory `DEFAULT_DIR="..."` with your full path `DEFAULT_DIR="$CurrentWorkingDirectory/YOURDIRECTORY"`.
   - Uncomment the line after `#To recompile ALGLIB` in `mpDPFT.sh` (usually needed only for the first compilation).
-  - Optionally, copy `mpDPFT.sh` to your default terminal folder for easy access.
-  - Copy ALGLIB source files (https://www.alglib.net/download.php) into YOURDIRECTORY/
-  - Copy placeins.sty (http://mirrors.ctan.org/macros/latex/contrib/placeins/placeins.sty) into YOURDIRECTORY/
-  - Copy epslatex2epspdf into the folder that contains the ps2eps executable (likely, /usr/bin/): `sudo cp YOURDIRECTORY/epslatex2epspdf /usr/bin/ && sudo chown YourUbuntuUserName:YourUbuntuUserName /usr/bin/epslatex2epspdf && sudo chmod 755 /usr/bin/epslatex2epspdf`
+  - Optionally, copy `mpDPFT.sh` to your default terminal folder for easy access. You can execute from there whenever you open a new terminal.
+  - Copy ALGLIB source files (https://www.alglib.net/download.php) into `YOURDIRECTORY`
+  - Copy `placeins.sty` (http://mirrors.ctan.org/macros/latex/contrib/placeins/placeins.sty) into `YOURDIRECTORY`
+  - Copy `epslatex2epspdf` into the folder that contains the `ps2eps` executable (likely, `/usr/bin/`): `sudo cp YOURDIRECTORY/epslatex2epspdf /usr/bin/ && sudo chown YourUbuntuUserName:YourUbuntuUserName /usr/bin/epslatex2epspdf && sudo chmod 755 /usr/bin/epslatex2epspdf`
 
 - **Notes for Execution**
-  - run mpDPFT, optionally specify X (number_of_threads) for parallelization and, also optionally, Y (after specifying X) for running several independent jobs in the sub-folders YOURDIRECTORY/runY: `./mpDPFT.sh X Y`
-  - All output will be stored the folder YOURDIRECTORY/#DATA/#zips/ (as created during installation)
-  - The output is summarized in mpDPFT_CombinedPlots.pdf (generated from mpDPFT_CombinedPlots.tex), the main log files are mpDPFT_Control.dat and mpDPFT_ControlTask.dat, the main data files that are generated are mpDPFT_CutData.dat, mpDPFT_ContourData.dat, mpDPFT_Den.dat, and mpDPFT_V.dat.
-  - Examples with all source files and all input files are provided in /#DATA/#zips/ (including mpDPFT.input, which specifies the main input parameters - other input parameters are hard-coded and marked by //BEGIN USER INPUT in mpDPFT.cpp and elsewhere)
-  - For controlled termination of selfconsistent DPFT loop [or task] during runtime: Replace 0 by 1 [or by 2] in mpDPFTmanualSCloopBreakQ.dat (or in mpDPFTmanualOPTloopBreakQ.dat)
+  - run mpDPFT, optionally specify X (number_of_threads) for parallelization and, also optionally, Y (after specifying X) for running several independent jobs in the sub-folders `YOURDIRECTORY/runY`: `./mpDPFT.sh X Y`
+  - All output will be stored in the folder `YOURDIRECTORY/#DATA/#zips/` (as created during installation)
+  - The output is summarized in `mpDPFT_CombinedPlots.pdf` (generated from `mpDPFT_CombinedPlots.tex`), the main log files are `mpDPFT_Control.dat` and `mpDPFT_ControlTask.dat`, the main data files that are generated are `mpDPFT_CutData.dat`, `mpDPFT_ContourData.dat`, `mpDPFT_Den.dat`, and `mpDPFT_V.dat`.
+  - Examples with all source files and all input files are provided in `/#DATA/#zips/` (including mpDPFT.input, which specifies the main input parameters - other input parameters are hard-coded and marked by `//BEGIN USER INPUT` in `mpDPFT.cpp` and elsewhere)
+  - For controlled termination of selfconsistent DPFT loop [or task] during runtime: Replace 0 by 1 [or by 2] in `mpDPFTmanualSCloopBreakQ.dat` (or in `mpDPFTmanualOPTloopBreakQ.dat`)
 
 
 ---

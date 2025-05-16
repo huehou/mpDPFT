@@ -212,7 +212,7 @@ git merge --no-ff contour
 ## 5. Resolve conflicts & finalize
 
 ```bash
-git add <resolved-files>
+git add .
 git commit
 ```
 - **remote:** none
@@ -245,3 +245,13 @@ git push origin master
 | `git add` + `git commit`          | –                                          | Finalizes merge commit                      | Cleans conflict markers                                     |
 | `git push origin master`          | Updates remote `master`                    | –                                           | No change                                                   |
 
+
+
+revert to earlier commit:
+
+git log -> find commit ID (e.g. d48da7dfee02edac332bcd7101948f4db40f812e)
+git checkout ID -> see files of this commit in kile, to confirm, if need be, that this is the version to revert to
+git checkout master -> switch to master
+git branch -> see where the HEAD is
+git reset --hard d48da7dfee02edac332bcd7101948f4db40f812e
+git reset --hard origin/master d48da7dfee02edac332bcd7101948f4db40f812e

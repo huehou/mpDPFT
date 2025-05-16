@@ -659,13 +659,10 @@ double fcontour(double u, void *params){
         val2 = 2*u*v * (sinim + dvdu_term * cosim); // Im * Im
         val = - re * (val1 + val2) / (4*gamma*pow((u2+v2), 2));
     } else if (D==2){
-        cout << "DIM2" << endl;
-
         val1 = (3*u2*v-v3) * (cosim - dvdu_term*sinim);
         val2 =  - (u3 - 3*u*v2) * (sinim + dvdu_term * cosim);
         val = re * (val1 + val2) / (8*g2*pow((u2+v2), 3));
     } else if (D==3){
-        cout << "DIM3" << endl;
         val1 = (u4-6*u2*v2+v4) * (cosim - dvdu_term*sinim);
         val2 =  - (-4*u3*v+4*u*v3) * (sinim + dvdu_term * cosim);
         val = re * (val1 + val2) / (16*g3*pow((u2+v2), 4));

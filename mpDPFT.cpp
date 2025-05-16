@@ -187,9 +187,9 @@ void GetData(taskstruct &task, datastruct &data){
     RunTests(task,data);  
 
     if(data.FLAGS.Export) PRINT(" ***** run auxilliary tasks 3 ****",data);
-	RunAuxTasks(task,data);
-    SanityChecks(data);
-    Misc(data);
+	//RunAuxTasks(task,data);
+    //SanityChecks(data);
+   // Misc(data);
 
 	if(data.FLAGS.InitializeDensities){
 		if(data.FLAGS.Export) PRINT(" ***** initialize densities ****",data);

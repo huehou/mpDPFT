@@ -341,7 +341,7 @@ double KD(int D, double A, double B, double &abserr, double reltolx, KDintegrati
 
   	//Alex' and Michael's contour integral
 
-
+	//cout << "start of KD" << endl;
   
 
     if (B < minB) {//B too small, approximate by sqrt(A_+)^D * J_D(sqrt(A_+))
@@ -874,7 +874,7 @@ double KD_contour(int D, double A, double B, KDintegrationParams &KDip){
     double result_gaussian;
     if(check_gaussian_profile(&params)){
     //if(A>100000 || B>100000 || (A>1e5 && B < 1.) || (A < -10 && (std::abs(A) > 100*std::abs(B))) || (A<1 && B >= 1e4)){
-        cout <<  "Gaussian contour " << A << " " << B << endl;
+        //cout <<  "Gaussian contour " << A << " " << B << endl;
         result = fcontour_gaussian(1.000001, &params);
 
     } else {

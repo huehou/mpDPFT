@@ -246,12 +246,59 @@ git push origin master
 | `git push origin master`          | Updates remote `master`                    | –                                           | No change                                                   |
 
 
+# Revert to an Earlier Commit
 
-revert to earlier commit:
+Follow these steps to roll your `master` branch back to a known commit (e.g. `d48da7dfee02edac332bcd7101948f4db40f812e`), verify it, and force-push the change to `origin`.
 
-git log -> find commit ID (e.g. d48da7dfee02edac332bcd7101948f4db40f812e)
-git checkout ID -> see files of this commit in kile, to confirm, if need be, that this is the version to revert to
-git checkout master -> switch to master
-git branch -> see where the HEAD is
-git reset --hard d48da7dfee02edac332bcd7101948f4db40f812e
-git reset --hard origin/master d48da7dfee02edac332bcd7101948f4db40f812e
+---
+
+1. **Find the commit ID**
+
+   ```bash
+   git log
+   # … locate the hash you want (e.g. d48da7dfee02edac332bcd7101948f4db40f812e)
+   ```
+
+2. **Inspect that commit (optional)**
+
+   ```bash
+   git checkout d48da7dfee02edac332bcd7101948f4db40f812e
+   # ⮕ your WD and index now match that snapshot; open files to confirm
+   ```
+
+3. **Return to master**
+
+   ```bash
+   git checkout master
+   git branch
+   # ⮕ switch back to your master branch, check where the HEAD is
+   ```
+
+4. **Reset local master to the chosen commit**
+
+   ```bash
+   git reset --hard d48da7dfee02edac332bcd7101948f4db40f812e
+   # ⮕ master’s tip, index, and WD now match that commit exactly
+   ```
+
+5. **Force-push the reset to GitHub**
+
+   ```bash
+   git push origin master --force-with-lease
+   # ⮕ origin/master is rewritten to match your local master
+   ```
+
+6. **(Optional) Sync down again**
+
+   ```bash
+   git pull origin master
+   # ⮕ confirm your local WD/index match the newly updated origin
+   ```
+
+---
+
+> **Notes:**
+> - `--hard` will discard any uncommitted work—stash or commit first if needed.
+> - Prefer `--force-with-lease` over `--force` to avoid clobbering remote changes you haven’t seen.
+> - Once reset and pushed, the orphaned commits are no longer on `master` (but still retrievable by hash until garbage-collected).
+

@@ -308,6 +308,14 @@ void Gets1s2(double phi, double s0, double A, double Bcube, double thirdBcube, d
 double KD_Contour(int D, double A, double B, KDintegrationParams &KDip){
     KDip.IntegrationArraySize = 10000;
     KDip.minB = 0.01;
+    //A>100000 || B>100000 || (A>1e5 && B < 1.) || (A < -10 && (std::abs(A) > 100*std::abs(B))) || (A<1 && B >= 1e4)
+
+    //KD_contour(1, 120000, 120000, KDip);
+    //KD_contour(1, 120000, 0.1, KDip);
+    //KD_contour(1, -10000, 12, KDip);
+    //KD_contour(1, 0.1, 12000, KDip);
+
+    //cin >> A;
     return KD_contour(D, A, B, KDip);
 }
 
@@ -543,10 +551,6 @@ struct params_t {
 };
 
 double dvdu(double u, double v, double A, double B, double gamma){
-    //params_t *p = (params_t *)params;
-    //double A = p->A;
-    //double B = p->B;
-    //double gamma = p->gamma;
 
     double g = 4*pow(B, 3)*pow(u, 4)*pow(gamma, 4);
 
@@ -558,7 +562,6 @@ double dvdu(double u, double v, double A, double B, double gamma){
     double numerator = p0+p1+p2-p3;
     double denominator = 2*u*v*(1+g+4*pow(B, 3)*pow(gamma, 4)*pow(v, 2)*(2*pow(u, 2)+pow(v, 2)));
     double val = numerator / denominator;
-    //printf("dvdu: %.10f\n", val);
 
     return val;
 }
@@ -566,7 +569,6 @@ double dvdu(double u, double v, double A, double B, double gamma){
 bool is_close(double a, double b, double atol) {
     return std::abs(a - b) <= atol;
 }
-
 
 double fcontour(double u, void *params){
     params_t *p = (params_t *)params;  // Cast params to the correct type
@@ -587,18 +589,10 @@ double fcontour(double u, void *params){
     double B6 = p->B6;
     double cosim = p->cosim;
     double sinim = p->sinim;
-    //p->calls++;
 
     int coeff = (u < 1) ? -1 : 1;
 
     double v;
-    //std::cout << B3 << " " << B6 << std::endl;
-    //printf("gamma: %.10f\n", gamma);
-    //printf("eta: %.10f\n", eta);
-    //printf("A: %.10f\n", A);
-    //printf("B: %.10f\n", B);
-    //printf("coeff: %.10f\n", coeff);
-
 
     // Determine v based on contour
     double p0, p1, p2, p3, p4, p5, p6, p7, p8;
@@ -636,17 +630,8 @@ double fcontour(double u, void *params){
     double v4 = pow(v, 4);
     double v6 = pow(v, 6);
 
-    //printf("u: %.10f\n", u);
-    //printf("v: %.10f\n", v);
-
-    // Plug in (u, v) into real part of integral
-    //std::complex<double> t(u, v);
     double Reexponent = -A*gamma*v - g3 * (3*u2*v-v3) * B3/3 + v/(4*gamma*(u2+v2));
-    //double Imexponent = A*gamma*u + 1/3*pow(gamma, 3)*(pow(u, 3)-3*u*pow(v,2))*pow(B, 3) + u/(4*gamma*(pow(u, 2)+pow(v, 2)));
-    //double Imexponent = A*gamma + pow(gamma, 3)/3 + 1/(4*gamma);
 
-
-    //std::complex<double> coeff_term1 = - 1.0 / (4*gamma*pow(t, 2));
 
     // Calculate dv / du term
     double dvdu_term;
@@ -663,20 +648,13 @@ double fcontour(double u, void *params){
         double denominator = 2*u*v*(1 + g + 4*B3*g4*v2*(2*u2+v2) );
         dvdu_term = numerator / denominator;
     }
-    //std::complex<double> jac = std::complex<double>(1, dvdu_term);
+
     double re = exp(Reexponent);
-    //std::complex<double> im = cosim + std::complex<double>(0.0, 1)*sinim; //std::exp(std::complex<double>(0.0, eta));
 
     double val, val1, val2;
 
-    //std::complex<double> denom = 2.0 * gamma * std::complex<double>(0, 1) * t;
-    //std::complex<double> coeff_term =  gamma * 1.0 / pow(denom, D+1);
-    //printf("coeff: %.10f\n", real(coeff_term));
-
-    //printf("coeff analysis: %.10f\n", - gamma * real(std::complex<double>((u2-v2)/ 4*g2*pow((u2+v2), 2), 2*u*v/ 4*g2*pow((u2+v2), 2))) );
-    //val = re * real(coeff_term * jac * im);
-
     if (D==1){
+
         val1 = (u2-v2) * (cosim - dvdu_term * sinim); // Re
         val2 = 2*u*v * (sinim + dvdu_term * cosim); // Im * Im
         val = - re * (val1 + val2) / (4*gamma*pow((u2+v2), 2));
@@ -690,16 +668,26 @@ double fcontour(double u, void *params){
         val = re * (val1 + val2) / (16*g3*pow((u2+v2), 4));
     }
 
-    //printf("imexponent: %.10f\n", eta);
-
-    //printf("coeff: %.10f\n", real(coeff_term * re * jac * im));
-    //printf("u: %.10f\n", u);
-    //printf("val1: %.10f\n", cosim);
-    //printf("val2: %.10f\n", dvdu_term);
-
-    //printf("val: %.10f\n", val);
-
     return val;
+}
+
+bool check_gaussian_profile(void *params){
+
+    double stdev = 1.e-3;
+    double peak = fcontour(1, &params);
+    double pi = 3.14159;
+    int n = 2;
+    double stdev_x = 2*stdev;
+
+    double bound = peak/(2*pi*pow(stdev, 2)) * exp(pow(n, 2)/2);
+
+    double fr = fcontour(1 + stdev_x, &params);
+    double fl = fcontour(1 - stdev_x, &params);
+
+    if ((fl < bound) && (fr < bound))
+        return true;
+    else
+        return false;
 }
 
 
@@ -793,10 +781,6 @@ double fcontour_gaussian(double u, void *params){
     t04 = 4*B3*g4 + 1 / (u2v2_2);
     ddvduu = (t01 + t02 + u*(t03 + dvdu2 * t04)) / (u*v*t04);
 
-    //cout << (u*v*t04) << endl;
-    //cout << "u: " << u << " v: " << v << endl;
-    //cout << t01 << " " << t02 << " " << t03 << " " << t04 << endl;
-    //cout << "ddvduu: " << ddvduu << endl;
     double a, b, c;
     a = -A*gamma*v + v/(4*gamma*(1+v2)) + 1./3*B3*g3*(-3*v+v3);
     b = -A*gamma*dvdu + (-2*v+dvdu-v2*dvdu)/(4*gamma*pow((1+v2), 2))
@@ -806,7 +790,6 @@ double fcontour_gaussian(double u, void *params){
         + 1 / (8*gamma*pow((1+v2), 3)) * (6*v-2*v3-4*dvdu+12*v2*dvdu -
             6*v*dvdu2 + 2*v3*dvdu2 + ddvduu - v4*ddvduu);
 
-    //cout << a << " " << b << " " << c << endl;
     double re;
     if (c>=0){
         double t1 = -0.25*pow(b, 2) / c;
@@ -881,13 +864,6 @@ double KD_contour(int D, double A, double B, KDintegrationParams &KDip){
     F.function = &fcontour;
     F.params = &params;
     size_t neval;
-    //auto start = std::chrono::high_resolution_clock::now();
-    //for(int i=0; i<40; i++){
-    //    result = fcontour(i/100, &params);
-    //}
-    //gsl_integration_qag(&F, x_m - w, x_m + w, 1e-6, 1e-6, 100, GSL_INTEG_GAUSS10, w, &result, &error);
-
-    //gsl_integration_qng(&F, 0.01, 100., 1e-2, 1000, &result, &error, &neval);
 
     if (B < KDip.minB){
         double arg = sqrt(max(A, 0.));
@@ -896,8 +872,9 @@ double KD_contour(int D, double A, double B, KDintegrationParams &KDip){
     double x = sqrt(A2+B2);
     int L = 1;
     double result_gaussian;
-    if(A>100000 || B>100000 || (A>1e5 && B < 1.) || (A < -10 && (std::abs(A) > 100*std::abs(B))) || (A<1 && B >= 1e4)){
-        //cout <<  "Gaussian contour" << endl;
+    if(check_gaussian_profile(&params)){
+    //if(A>100000 || B>100000 || (A>1e5 && B < 1.) || (A < -10 && (std::abs(A) > 100*std::abs(B))) || (A<1 && B >= 1e4)){
+        cout <<  "Gaussian contour " << A << " " << B << endl;
         result = fcontour_gaussian(1.000001, &params);
 
     } else {
@@ -908,18 +885,8 @@ double KD_contour(int D, double A, double B, KDintegrationParams &KDip){
         if (status != GSL_SUCCESS) printf("KD_contour: Error in integration: %s\n A = %f B = %f \n", gsl_strerror(status),A,B);
         gsl_integration_workspace_free(workspace);
     }
-    //auto mid = std::chrono::high_resolution_clock::now();
 
     double total_result = 2/3.14159 * result;
-    //cout << "integration result: " << total_result << " gaussian:" << result_gaussian << endl;
-
-    //std::chrono::duration<double> duration1 = mid - start;
-
-    //std::cout << "Time taken inside loop: " << duration1.count() << " with calls " << neval << std::endl;
-    //for(double i=0.1; i<5.0;i+=0.1){
-    //    fc.push_back(fcontour(i, &params));
-    //}
-
 
     return total_result;
 }

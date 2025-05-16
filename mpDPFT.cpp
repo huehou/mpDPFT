@@ -187,9 +187,9 @@ void GetData(taskstruct &task, datastruct &data){
     RunTests(task,data);  
 
     if(data.FLAGS.Export) PRINT(" ***** run auxilliary tasks 3 ****",data);
-	RunAuxTasks(task,data);
-    SanityChecks(data);
-    Misc(data);
+	//RunAuxTasks(task,data);
+    //SanityChecks(data);
+   // Misc(data);
 
 	if(data.FLAGS.InitializeDensities){
 		if(data.FLAGS.Export) PRINT(" ***** initialize densities ****",data);
@@ -4163,7 +4163,7 @@ void Getn7(int s, datastruct &data){
 	KDparameters.distinguishabilityThreshold = 1.0e-14;
 	KDparameters.printQ = 0;
 	KDparameters.CompareKD = true;
-    //KDip.contourQ = true;
+  KDip.contourQ = true;
 	//data.Print = 1;
     double tauThreshold = 1.0e-10;
 	//END USER INPUT

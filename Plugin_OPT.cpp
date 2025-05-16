@@ -333,6 +333,7 @@ void InitializeCMA(OPTstruct &opt){
 	OPTprint("       homotopy                          = " + to_string(opt.homotopy),opt);
 	OPTprint("       DivideAndConquer                  = " + to_string(opt.DivideAndConquer),opt);
 	OPTprint("       BreakBadRuns                      = " + to_string(opt.BreakBadRuns),opt);
+	OPTprint("              below StdDevThreshold      = " + to_string(sqrt((double)opt.cma.VarianceCheck)*opt.epsf),opt);
 	OPTprint("       ReportX                           = " + to_string(opt.ReportX),opt);
 	OPTprint("       epsf                              = " + to_string_with_precision(opt.epsf,4),opt);
 	OPTprint("       printQ                            = " + to_string(opt.printQ),opt);
@@ -975,7 +976,10 @@ void UpdateCMA(OPTstruct &opt){
 					double mean = accumulate(opt.cma.history[p].begin(),opt.cma.history[p].end(),0.)/((double)N), StdDev = 0.;
 					for(int h=0;h<N;h++) StdDev += (opt.cma.history[p][h]-mean)*(opt.cma.history[p][h]-mean);
 					StdDev = sqrt(StdDev/((double)N));
-					if(StdDev<StdDevThreshold && opt.homotopy<=1) opt.cma.AbortQ[p] = 1;
+					if(StdDev<StdDevThreshold && opt.homotopy<=1){
+						opt.cma.AbortQ[p] = 1;
+						opt.cma.report[2] += "  >>>>> BreakBadRun p = " + to_string(p) + " @ generation = " + to_string(opt.cma.generation) + " since " + to_string(StdDev) + " < " + to_string(StdDevThreshold) + " (StdDevThreshold)";
+					}
 				}
 			}
 		}

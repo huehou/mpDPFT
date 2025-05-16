@@ -8747,7 +8747,7 @@ void RunTests(taskstruct &task, datastruct &data){
 }
 
 void RunAuxTasks(taskstruct &task, datastruct &data){
-	//ParetoFront(data,task);
+	ParetoFront(data,task);
 }
 
 
@@ -11270,15 +11270,15 @@ vector<double> Optimize(int func_ID, int opt_ID, int aux, datastruct &data, task
         	opt.homotopy = 0;
             //opt.DivideAndConquer = 3.;
         	opt.printQ = 1;
-        	opt.cma.runs = 20;//(int)POW(2.,aux)*10*opt.D;
-            //opt.cma.ResetSchedule = -1;
-            opt.cma.generationMax = 1000;//10000;//
-        	opt.cma.popExponent = 0.;
-        	opt.cma.VarianceCheck = opt.D;//5*opt.D;
+        	opt.cma.runs = 400;//(int)POW(2.,aux)*10*opt.D;
+            opt.cma.ResetSchedule = -1;
+            opt.cma.generationMax = 500;//10000;//
+        	opt.cma.popExponent = 1.;
+        	opt.cma.VarianceCheck = 5*opt.D;
         	opt.stallCheck = 10*opt.D;
         	opt.cma.CheckPopVariance = max(3./opt.cma.runs,3./20.);
-        	opt.cma.PopulationDecayRate = 0.;
-            opt.cma.CrossTalk = 0.005;
+        	opt.cma.PopulationDecayRate = 5.;
+            //opt.cma.CrossTalk = 0.;
             //opt.cma.InitStepSizeFactor = 0.3;
         	//opt.cma.PickRandomParamsQ = true;
         	//opt.cma.DelayEigenDecomposition = true;

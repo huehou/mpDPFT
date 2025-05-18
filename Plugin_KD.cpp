@@ -876,11 +876,26 @@ double KD_contour(int D, double A, double B, KDintegrationParams &KDip){
         result = fcontour_gaussian(1.000001, &params);
 
     } else {
-        //cout <<  "GSL Integration" << endl;
+       //cout <<  "GSL Integration" << endl;
         gsl_integration_workspace *workspace = gsl_integration_workspace_alloc(KDip.IntegrationArraySize);
         gsl_set_error_handler_off();
         int status = gsl_integration_qags(&F, 1e-4, 3., 1e-6, 1e-4, KDip.IntegrationArraySize, workspace, &result, &error); // take out e^I \eta
-        if (status != GSL_SUCCESS) printf("KD_contour: Error in integration: %s\n A = %f B = %f \n", gsl_strerror(status),A,B);
+        if (status != GSL_SUCCESS){
+            double resultp1, resultp2;
+            printf("KD_contour: Error in integration: %s\n A = %f B = %f -> result %f\n", gsl_strerror(status),A,B, result);
+            gsl_integration_workspace *workspace2 = gsl_integration_workspace_alloc(KDip.IntegrationArraySize);
+            gsl_integration_workspace *workspace3 = gsl_integration_workspace_alloc(KDip.IntegrationArraySize);
+
+
+            int status3 = gsl_integration_qags(&F, 2., 3., 1e-5, 1e-4, KDip.IntegrationArraySize, workspace3, &resultp2, &error); // take out e^I \eta
+            int status2 = gsl_integration_qags(&F, 1e-4, 1.999999, 1e-5, 1e-4, KDip.IntegrationArraySize, workspace2, &resultp1, &error); // take out e^I \eta
+            result = resultp1 + resultp2;
+            if (status2 != GSL_SUCCESS || status3 != GSL_SUCCESS)
+                printf("New result WITH error: %f %s %s\n", result, gsl_strerror(status2), gsl_strerror(status3));
+            else
+                printf("New result, NO error: %f\n", result);
+
+        } 
         gsl_integration_workspace_free(workspace);
     }
 

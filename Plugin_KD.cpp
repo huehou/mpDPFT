@@ -306,17 +306,12 @@ void Gets1s2(double phi, double s0, double A, double Bcube, double thirdBcube, d
 }
 
 double KD_Contour(int D, double A, double B, KDintegrationParams &KDip){
-    KDip.IntegrationArraySize = 10000;
-    KDip.minB = 0.01;
-    //A>100000 || B>100000 || (A>1e5 && B < 1.) || (A < -10 && (std::abs(A) > 100*std::abs(B))) || (A<1 && B >= 1e4)
-
-    //KD_contour(1, 120000, 120000, KDip);
-    //KD_contour(1, 120000, 0.1, KDip);
-    //KD_contour(1, -10000, 12, KDip);
-    //KD_contour(1, 0.1, 12000, KDip);
-
-    //cin >> A;
-    return KD_contour(D, A, B, KDip);
+    //KDip.IntegrationArraySize = 10000;
+    //KDip.minB = 0.01;
+    //return 0;
+    double h = KD_contour(D, A, B, KDip);
+    //cout << h << endl;
+    return h;
 }
 
 double KD(int D, double A, double B, double &abserr, double reltolx, KDintegrationParams &KDip) {
@@ -341,15 +336,16 @@ double KD(int D, double A, double B, double &abserr, double reltolx, KDintegrati
 
   	//Alex' and Michael's contour integral
 
-
-  
-
     if (B < minB) {//B too small, approximate by sqrt(A_+)^D * J_D(sqrt(A_+))
-        abserr = -1.;
+        abserr = 0;
 		double arg = sqrt(max(A,0.));
 		return POW(arg,D) * gsl_sf_bessel_Jn(D, arg);
 	}
     else {
+        if(KDip.contourQ)
+            return KD_Contour(D, A, B, KDip);
+        double KDval;
+
         abserr = 0.;
         // set up parameters
         double Asq = A * A;
@@ -408,10 +404,10 @@ double KD(int D, double A, double B, double &abserr, double reltolx, KDintegrati
             // LOOP FROM phi0 < 0 to 0.
             double testK = ABS(phi0p)/dd;
             if (testK > maxK) {
-                abserr = -1.;
+                abserr = 0.;
                 return KDapr(D,A,B);
             }
-            if(KDip.contourQ) return KD_Contour(D, A, B, KDip);
+
             K = (int)(ABS(phi0p)/dd);
             int iMax = max(0,K);
             if(K>0){
@@ -436,7 +432,6 @@ double KD(int D, double A, double B, double &abserr, double reltolx, KDintegrati
 
         }
         else{
-            if(KDip.contourQ) return KD_Contour(D, A, B, KDip);
             if(D==1) res = sin(phi0p) - phi0p * cos(phi0p);
             else if(D==2) res = (-2.*(sin(phi0p) - phi0p * cos(phi0p))+sin(phi0p)*(phi0p*phi0p-0.5*A));
             else if(D==3) res = (-6.*(sin(phi0p) - phi0p * cos(phi0p))+3.*sin(phi0p)*(phi0p*phi0p-0.25*A)-cos(phi0p)*(pow(phi0p,3.)-0.75*A*phi0p));
@@ -530,6 +525,11 @@ double KD(int D, double A, double B, double &abserr, double reltolx, KDintegrati
         gsl_integration_qawo_table_free(wf2);
         gsl_integration_workspace_free(w);
         for (int i = 0; i < W.size(); ++i) gsl_integration_workspace_free(W[i]);
+
+        if (abs((KDval-res)/res)>0.01)
+            printf("%f %f %f %f\n", A, B, KDval, res);
+
+
         return res;
         
     }
@@ -673,14 +673,14 @@ double fcontour(double u, void *params){
 
 bool check_gaussian_profile(void *params){
 
-    double stdev = 1.e-3;
-    double peak = fcontour(1, &params);
+    double stdev = 5.e-3;
+    double peak = abs(fcontour(1.0, params));
     double pi = 3.14159;
 
     double bound = peak * exp(-1/2);
 
-    double fr = fcontour(1 + stdev, &params);
-    double fl = fcontour(1 - stdev, &params);
+    double fr = abs(fcontour(1 + stdev, params));
+    double fl = abs(fcontour(1 - stdev, params));
 
     if ((fl < bound) && (fr < bound))
         return true;
@@ -835,7 +835,7 @@ double fcontour_gaussian(double u, void *params){
 double KD_contour(int D, double A, double B, KDintegrationParams &KDip){
 
     double gamma;
-    if (A > 0 && B < KDip.minB)
+    if (A > 0 && B < 0.01)
         gamma = 0.5 * 1./sqrt(A);
     else
         gamma = sqrt( (-A + sqrt(pow(A, 2) + pow(B, 3))) / (2*pow(B, 3)) );
@@ -863,37 +863,42 @@ double KD_contour(int D, double A, double B, KDintegrationParams &KDip){
     F.params = &params;
     size_t neval;
 
-    if (B < KDip.minB){
+    if (B < 0.01){
         double arg = sqrt(max(A, 0.));
         return pow(arg, D) * gsl_sf_bessel_Jn(D, arg);
     }
     double x = sqrt(A2+B2);
     int L = 1;
     double result_gaussian;
+    int IntegrationArraySize = 1000;
     if(check_gaussian_profile(&params)){
-    //if(A>100000 || B>100000 || (A>1e5 && B < 1.) || (A < -10 && (std::abs(A) > 100*std::abs(B))) || (A<1 && B >= 1e4)){
-        cout <<  "Gaussian contour " << A << " " << B << endl;
+    //if (A>100000 || B>100000 || (A>1e5 && B < 1.) || (A < -10 && (std::abs(A) > 100*std::abs(B))) || (A<1 && B >= 1e4)){
         result = fcontour_gaussian(1.000001, &params);
-
     } else {
-       //cout <<  "GSL Integration" << endl;
-        gsl_integration_workspace *workspace = gsl_integration_workspace_alloc(KDip.IntegrationArraySize);
+        //cout <<  "GSL Integration " <<A<< endl;
+        gsl_integration_workspace *workspace = gsl_integration_workspace_alloc(IntegrationArraySize);
         gsl_set_error_handler_off();
-        int status = gsl_integration_qags(&F, 1e-4, 3., 1e-6, 1e-4, KDip.IntegrationArraySize, workspace, &result, &error); // take out e^I \eta
+        int status = gsl_integration_qags(&F, 1e-4, 3., 1e-6, 1e-4, IntegrationArraySize, workspace, &result, &error); // take out e^I \eta
         if (status != GSL_SUCCESS){
-            double resultp1, resultp2;
+            double resultp1, resultp2, resultp3;
             printf("KD_contour: Error in integration: %s\n A = %f B = %f -> result %f\n", gsl_strerror(status),A,B, result);
-            gsl_integration_workspace *workspace2 = gsl_integration_workspace_alloc(KDip.IntegrationArraySize);
-            gsl_integration_workspace *workspace3 = gsl_integration_workspace_alloc(KDip.IntegrationArraySize);
+            gsl_integration_workspace *workspace2 = gsl_integration_workspace_alloc(IntegrationArraySize);
+            gsl_integration_workspace *workspace3 = gsl_integration_workspace_alloc(IntegrationArraySize);
+            gsl_integration_workspace *workspace4 = gsl_integration_workspace_alloc(IntegrationArraySize);
 
+            int status2 = gsl_integration_qags(&F, 1e-4, 1., 1e-5, 1e-4, IntegrationArraySize, workspace2, &resultp1, &error); // take out e^I \eta
+            int status3 = gsl_integration_qags(&F, 1., 2., 1e-5, 1e-4, IntegrationArraySize, workspace3, &resultp2, &error); // take out e^I \eta
+            int status4 = gsl_integration_qags(&F, 2., 3., 1e-5, 1e-4, IntegrationArraySize, workspace4, &resultp3, &error); // take out e^I \eta
 
-            int status3 = gsl_integration_qags(&F, 2., 3., 1e-5, 1e-4, KDip.IntegrationArraySize, workspace3, &resultp2, &error); // take out e^I \eta
-            int status2 = gsl_integration_qags(&F, 1e-4, 1.999999, 1e-5, 1e-4, KDip.IntegrationArraySize, workspace2, &resultp1, &error); // take out e^I \eta
-            result = resultp1 + resultp2;
-            if (status2 != GSL_SUCCESS || status3 != GSL_SUCCESS)
-                printf("New result WITH error: %f %s %s\n", result, gsl_strerror(status2), gsl_strerror(status3));
+            result = resultp1 + resultp2 + resultp3;
+            if (status2 != GSL_SUCCESS || status3 != GSL_SUCCESS || status4 != GSL_SUCCESS)
+                printf("New result WITH error: %f, %s, %s, %s\n", result, gsl_strerror(status2), gsl_strerror(status3), gsl_strerror(status4));
             else
                 printf("New result, NO error: %f\n", result);
+
+            gsl_integration_workspace_free(workspace2);
+            gsl_integration_workspace_free(workspace3);
+            gsl_integration_workspace_free(workspace4);
 
         } 
         gsl_integration_workspace_free(workspace);

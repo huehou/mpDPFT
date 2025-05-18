@@ -4356,7 +4356,7 @@ void Getn7(int s, datastruct &data){
 							if(COMPUTEKD[c][j].ABres.size()!=3){ PRINT("Getn7: GetTriangulatedFuncVal error: COMPUTEKD[c][j].ABres.size()!=3",data); usleep(10000000); }
 						}
 						else KDval = KD(data.DIM,A,B,ABSERR2,data.InternalAcc,KDip);
-            if(!std::isfinite(KDval)){ PRINT("Getn7: KDval error: !std::isfinite(KDval) " + to_string(c) + " " + to_string(j),data); usleep(10000000); }
+                        if(!std::isfinite(KDval)){ PRINT("Getn7: KDval error: !std::isfinite(KDval) " + to_string(c) + " " + to_string(j),data); usleep(10000000); }
 					}
 					else if(METHOD==4){
 						KDparams kdparameters = KDparameters;
@@ -4364,17 +4364,12 @@ void Getn7(int s, datastruct &data){
 						KDval = kdparameters.Result;
 					}
 					tmpfield[j] = KDval/POW(4.*PI*dist2,data.DIM);
-					if(ABS(tmpfield[j])>MP){
-            //cout << "error " << ABSERR2 << endl;
-            AverageRelERR += ABSERR2/ABS(tmpfield[j]);
-          } 
+					if(ABS(tmpfield[j])>MP) AverageRelERR += ABSERR2/ABS(tmpfield[j]);
 				}
-				else{
-          tmpfield[j] = GetID(tauThreshold,s,FocalIndex,Norm(rVec),FocalIndex,Norm(rVec),data);
-        } 
+				else tmpfield[j] = GetID(tauThreshold,s,FocalIndex,Norm(rVec),FocalIndex,Norm(rVec),data);
 			}
 			data.Den[s][FocalIndex] = data.degeneracy*Integrate(data.ompThreads,data.method, data.DIM, tmpfield, data.frame);
- 			//if(omp_get_thread_num()==0) PRINT("density[" + to_string(FocalIndex) + "] = " + to_string(data.Den[s][FocalIndex]),data);
+ 			if(omp_get_thread_num()==0) PRINT("density[" + to_string(FocalIndex) + "] = " + to_string(data.Den[s][FocalIndex]),data);
 		}
 	}
   
@@ -8752,7 +8747,7 @@ void RunTests(taskstruct &task, datastruct &data){
 }
 
 void RunAuxTasks(taskstruct &task, datastruct &data){
-	ParetoFront(data,task);
+	//ParetoFront(data,task);
 }
 
 

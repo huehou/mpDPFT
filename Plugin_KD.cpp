@@ -306,12 +306,9 @@ void Gets1s2(double phi, double s0, double A, double Bcube, double thirdBcube, d
 }
 
 double KD_Contour(int D, double A, double B, KDintegrationParams &KDip){
-    //KDip.IntegrationArraySize = 10000;
-    //KDip.minB = 0.01;
-    //return 0;
-    double h = KD_contour(D, A, B, KDip);
-    //cout << h << endl;
-    return h;
+    //KDip.IntegrationArraySize = 10000; CHANGE
+    //KDip.minB = 0.01; CHANGE
+    return KD_contour(D, A, B, KDip);
 }
 
 double KD(int D, double A, double B, double &abserr, double reltolx, KDintegrationParams &KDip) {
@@ -343,7 +340,8 @@ double KD(int D, double A, double B, double &abserr, double reltolx, KDintegrati
 	}
     else {
         if(KDip.contourQ)
-            return KD_Contour(D, A, B, KDip);
+            return KD_Contour(D, A, B, KDip); // CHANGE
+        
         double KDval;
 
         abserr = 0.;
@@ -525,10 +523,6 @@ double KD(int D, double A, double B, double &abserr, double reltolx, KDintegrati
         gsl_integration_qawo_table_free(wf2);
         gsl_integration_workspace_free(w);
         for (int i = 0; i < W.size(); ++i) gsl_integration_workspace_free(W[i]);
-
-        if (abs((KDval-res)/res)>0.01)
-            printf("%f %f %f %f\n", A, B, KDval, res);
-
 
         return res;
         
@@ -875,10 +869,9 @@ double KD_contour(int D, double A, double B, KDintegrationParams &KDip){
     //if (A>100000 || B>100000 || (A>1e5 && B < 1.) || (A < -10 && (std::abs(A) > 100*std::abs(B))) || (A<1 && B >= 1e4)){
         result = fcontour_gaussian(1.000001, &params);
     } else {
-        //cout <<  "GSL Integration " <<A<< endl;
         gsl_integration_workspace *workspace = gsl_integration_workspace_alloc(IntegrationArraySize);
         gsl_set_error_handler_off();
-        int status = gsl_integration_qags(&F, 1e-4, 3., 1e-6, 1e-4, IntegrationArraySize, workspace, &result, &error); // take out e^I \eta
+        int status = gsl_integration_qags(&F, 1e-4, 3., 1e-6, 1e-4, IntegrationArraySize, workspace, &result, &error);
         if (status != GSL_SUCCESS){
             double resultp1, resultp2, resultp3;
             printf("KD_contour: Error in integration: %s\n A = %f B = %f -> result %f\n", gsl_strerror(status),A,B, result);
@@ -886,9 +879,9 @@ double KD_contour(int D, double A, double B, KDintegrationParams &KDip){
             gsl_integration_workspace *workspace3 = gsl_integration_workspace_alloc(IntegrationArraySize);
             gsl_integration_workspace *workspace4 = gsl_integration_workspace_alloc(IntegrationArraySize);
 
-            int status2 = gsl_integration_qags(&F, 1e-4, 1., 1e-5, 1e-4, IntegrationArraySize, workspace2, &resultp1, &error); // take out e^I \eta
-            int status3 = gsl_integration_qags(&F, 1., 2., 1e-5, 1e-4, IntegrationArraySize, workspace3, &resultp2, &error); // take out e^I \eta
-            int status4 = gsl_integration_qags(&F, 2., 3., 1e-5, 1e-4, IntegrationArraySize, workspace4, &resultp3, &error); // take out e^I \eta
+            int status2 = gsl_integration_qags(&F, 1e-4, 1., 1e-5, 1e-4, IntegrationArraySize, workspace2, &resultp1, &error); 
+            int status3 = gsl_integration_qags(&F, 1., 2., 1e-5, 1e-4, IntegrationArraySize, workspace3, &resultp2, &error); 
+            int status4 = gsl_integration_qags(&F, 2., 3., 1e-5, 1e-4, IntegrationArraySize, workspace4, &resultp3, &error); 
 
             result = resultp1 + resultp2 + resultp3;
             if (status2 != GSL_SUCCESS || status3 != GSL_SUCCESS || status4 != GSL_SUCCESS)

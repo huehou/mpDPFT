@@ -676,13 +676,11 @@ bool check_gaussian_profile(void *params){
     double stdev = 1.e-3;
     double peak = fcontour(1, &params);
     double pi = 3.14159;
-    int n = 2;
-    double stdev_x = 2*stdev;
 
-    double bound = peak/(2*pi*pow(stdev, 2)) * exp(pow(n, 2)/2);
+    double bound = peak * exp(-1/2);
 
-    double fr = fcontour(1 + stdev_x, &params);
-    double fl = fcontour(1 - stdev_x, &params);
+    double fr = fcontour(1 + stdev, &params);
+    double fl = fcontour(1 - stdev, &params);
 
     if ((fl < bound) && (fr < bound))
         return true;

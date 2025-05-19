@@ -6,7 +6,7 @@
 2			//DIM				--- dimension
 1			//Units				--- {Energy,Length}. 0: default --- 1: {HO units} (with hbar=m=omega=1) --- 2: {eV,Angstrom} (with m=m_e)
 16.			//edge				--- physical edge length of cubic integration grid (centred @origin)
-32			//steps				--- #steps in each cartesian direction
+128			//steps				--- #steps in each cartesian direction
 2			//S				--- #species
 15. 15.			//Abundances			--- S-component vector<double> of target abundances
 0.			//RelAcc			--- relative target accuracy for Abundances (fixed-mu calculation if <MP)

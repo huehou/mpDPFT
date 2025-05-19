@@ -110,7 +110,7 @@ git clean -fd
 ```
 
 
-# Git Pull Request Cheat Sheet
+# Git Pull Request Cheat Sheet (command line. Alternatively: online at GitHub)
 
 ## 0. (Optional) Save or stash any in-progress work on master
 

@@ -331,7 +331,6 @@ double KD(int D, double A, double B, double &abserr, double reltolx, KDintegrati
   // double maxK = 100.*KDip.maxK;//return KDapr if floor(ABS(phi0p)/(2.*PI*k))>maxK; default=1.0e+6
   // int stepM = 10*KDip.stepM;//integration range for first estimation; default=1000
 
-  	//Alex' and Michael's contour integral
 
     if (B < minB) {//B too small, approximate by sqrt(A_+)^D * J_D(sqrt(A_+))
         abserr = 0;
@@ -866,7 +865,9 @@ double KD_contour(int D, double A, double B, KDintegrationParams &KDip){
     double result_gaussian;
     int IntegrationArraySize = 1000;
     if(check_gaussian_profile(&params)){
+
     //if (A>100000 || B>100000 || (A>1e5 && B < 1.) || (A < -10 && (std::abs(A) > 100*std::abs(B))) || (A<1 && B >= 1e4)){
+
         result = fcontour_gaussian(1.000001, &params);
     } else {
         gsl_integration_workspace *workspace = gsl_integration_workspace_alloc(IntegrationArraySize);

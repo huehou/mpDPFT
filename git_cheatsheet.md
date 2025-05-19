@@ -246,6 +246,7 @@ git push origin master
 | `git push origin master`          | Updates remote `master`                    | –                                           | No change                                                   |
 
 
+
 # Revert to an Earlier Commit
 
 Follow these steps to roll your `master` branch back to a known commit (e.g. `d48da7dfee02edac332bcd7101948f4db40f812e`), verify it, and force-push the change to `origin`.

@@ -44,4 +44,4 @@
 1.			//degeneracy			--- spin-multiplicity, etc.
 0			//regularize			--- vector<int> of accumulative regularization procedures for Densities
 0.375			//RegularizationThreshold	--- fraction of edge for regularize, DelFieldMethod, etc.
-1			//Print				--- -1: print only essential task output --- 0: print self-consistent iterations only if SCcount<10 or log10(SCcount)==integer --- 1: print all iterations --- 2: add timing information
+2			//Print				--- -1: print only essential task output --- 0: print self-consistent iterations only if SCcount<10 or log10(SCcount)==integer --- 1: print all iterations --- 2: add timing information

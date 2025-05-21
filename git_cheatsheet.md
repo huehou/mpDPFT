@@ -109,6 +109,20 @@ git clean -fd
     Remove all untracked files and folders
 ```
 
+---
+
+# Git Pull Request Cheat Sheet (online at GitHub)
+
+## 1. merge pull request online, resolve conflicts online.
+
+## 2. Update locally
+
+```bash
+git pull origin master
+# – updates local repo
+```
+
+---
 
 # Git Pull Request Cheat Sheet (command line. Alternatively: online at GitHub)
 

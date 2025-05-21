@@ -828,7 +828,7 @@ double fcontour_gaussian(double u, void *params){
 double KD_contour(int D, double A, double B, KDintegrationParams &KDip){
 
     double gamma;
-    if (A > 0 && B < 0.01)
+    if ( (A > 0 && A < 5e5 && B < 0.01) || (A >= 5e5 && B < 1) )
         gamma = 0.5 * 1./sqrt(A);
     else
         gamma = sqrt( (-A + sqrt(pow(A, 2) + pow(B, 3))) / (2*pow(B, 3)) );

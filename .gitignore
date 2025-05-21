@@ -32,6 +32,7 @@ Launch_tad_scan_local_all_noremotemount.sh
 login_remote_WorkStation.sh
 Login_remote_WorkStation.sh
 mount_Seagate_Primary_Backups.sh
+mpDPFT.zip
 nusHPC.sh
 retrieve_mpDPFT.sh
 Retrieve_mpDPFT.sh

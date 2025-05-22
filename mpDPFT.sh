@@ -70,6 +70,7 @@ rm mpDPFT_testK*.*
 rm $ProgramDirectory/run$job/TabFunc_Hint.dat
 mv $ProgramDirectory/run$job/TabFunc_Hint*.dat $ProgramDirectory/run$job/TabFunc_Hint.dat
 VInterpolIdentifier="mpDPFT_V_*.dat" && VInterpolIdentifier=$(echo $VInterpolIdentifier| cut -c 10-24) && if [[ ${#VInterpolIdentifier} -lt 15 ]]; then VInterpolIdentifier="?"; fi && echo "$VInterpolIdentifier" > mpDPFT_Aux.dat && mv mpDPFT_V_*.dat mpDPFT_V.dat
+#make clean
 make -j$(nproc)
 export OMP_NUM_THREADS=$threads
 export OMP_THREAD_LIMIT=$threads
@@ -82,11 +83,11 @@ export OMP_THREAD_LIMIT=$threads
 #export OMP_SCHEDULE=omp_sched_dynamic
 #export OMP_SCHEDULE=OMP_SCHED_GUIDED
 #export OMP_SCHEDULE=OMP_SCHED_AUTO
+#export ASAN_OPTIONS=detect_leaks=1:print_summary=1:verbosity=1
 nice -19 ./mpDPFT #option 1; default
-#gdb mpDPFT #option 2; for debugging. Select in MakeFile: CC= g++ -g ...; type 'run' when in (gdb) terminal, type 'bt' or 'thread apply all bt' for back-tracing; when stuck -> ctrl-c -> bt -> cont
-#valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all --track-origins=yes ./mpDPFT
-#valgrind --tool=massif --massif-out-file=massif.out ./mpDPFT
-#make clean
+#echo "gdb..." && gdb mpDPFT #option 2; for debugging. Select in MakeFile: CC= g++ -ggdb3 ...; type 'run' when in (gdb) terminal, type 'bt' or 'thread apply all bt' for back-tracing; when stuck -> ctrl-c -> bt -> cont
+#echo "valgrind..." && valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all --track-origins=yes ./mpDPFT
+#echo "valgrind..." && valgrind --tool=massif --massif-out-file=massif.out ./mpDPFT
 chmod u+rwx *.sh
 chmod u+rwx *.* *
 FILE=$ProgramDirectory/run$job/mpDPFT_MovieData.tmp

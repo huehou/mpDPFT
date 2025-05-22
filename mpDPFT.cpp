@@ -921,7 +921,7 @@ void InitializeHardCodedParameters(datastruct &data, taskstruct &task){
       	data.txtout << "KD.ReevaluateTriangulation " << data.KD.ReevaluateTriangulation << "\\\\";
       	data.KD.NumChecks = 100;//1: minimum (centroid) --- >1: more points to check in GoodTriangleQ. Discard triangles that do not pass NumChecks
       	data.txtout << "KD.NumChecks " << data.KD.NumChecks << "\\\\";
-      	int FocalDensitySteps = 128;//data.steps/4;//data.steps;//min(512,data.steps);//determines grid size for density n7 (should be less than data.steps), will be truncated automatically if necessary, for now only used together with Getn7()-METHOD==3.
+      	int FocalDensitySteps = 256;//data.steps/4;//data.steps;//min(512,data.steps);//determines grid size for density n7 (should be less than data.steps), will be truncated automatically if necessary, for now only used together with Getn7()-METHOD==3.
       	data.txtout << "FocalDensitySteps " << FocalDensitySteps << "\\\\";
       	data.KD.MergerRatioThreshold = 0.1;//minimum percentage of #CurrentMergers to merge good triangles again
       	data.txtout << "KD.MergerRatioThreshold " << data.KD.MergerRatioThreshold << "\\\\";
@@ -4173,6 +4173,8 @@ void Getn7(int s, datastruct &data){
 	DelField(data.V[s], s, data.DelFieldMethod, data);
     cout << "Getn7 derivatives computed" << endl;
 
+    PRINT("Getn7: FreeRAM1 = " + to_string_with_precision((double)getFreeRAM(data),5),data);
+
     double ABSERR;
 
 	if( data.Symmetry==1 || METHOD<3 ){
@@ -4239,111 +4241,24 @@ void Getn7(int s, datastruct &data){
 
 
 		}
-// 		#pragma omp parallel for schedule(dynamic) if(data.ompThreads>1)
-// 		for(int i=0;i<data.GridSize;i++){
-// 			if(data.SymmetryMask[i]){
-//
-//                 if(data.Symmetry==1){
-//                   	double r = Norm(data.VecAt[i]);
-//
-//                 }
-// 				else if(METHOD<3){
-//                   	int maxFieldSteps = 100, NumNLOthreshold = 0;
-//                   	double gamma = gsl_sf_gamma(1.+data.DDIM), partialSum = 0., maxdelta = 0., minNLO = 1.0e+300;
-// 					vector<double> tmpfield(data.GridSize);
-// 					for(int j=0;j<data.GridSize;j++){
-// 						double LO = 2./data.U*(data.muVec[s]-data.V[s][i]/3.-2.*data.V[s][j]/3.), NLO = pow(data.GradSquared[s][j]/(3.*data.U*data.U),1./3.), dist2 = Norm2(VecDiff(data.VecAt[i],data.VecAt[j])), dist = sqrt(dist2), alpha = 4*dist2*NLO, prefactor = 1./(8.*dist2*NLO*NLO);
-// 						if(METHOD<3){//with Bessel, for 1D
-// 							if(NLO<minNLO) minNLO = NLO;
-// 							if(NLO<ZEROGRAD2AT){
-// 								NumNLOthreshold++;
-// 								double k7zero = sqrt(POS(LO));
-// 								if(j==i) tmpfield[j] = k7zero*k7zero/(2.*PI*gamma);
-// 								else tmpfield[j] = k7zero*gsl_sf_bessel_Jn(1,2.*dist*k7zero)/(2.*PI*dist);
-// 							}
-// 							else{
-// 								double x1 = LO/NLO, AIprime = 0.; if(x1<-150.) AIprime = 0.; else if(x1<100.) AIprime = gsl_sf_airy_Ai_deriv(x1,GSL_PREC_DOUBLE);
-// 								if(j==i) tmpfield[j] = NLO*(x1*(1.-CurlyA(x1,data))-AIprime)/(2.*PI*gamma);
-// 								else{
-// 									tmpfield[j] = 0.;
-// 									if(METHOD==0 || METHOD==1){//brute-force integration
-// 										double x0 = min(-100.,x1-2.*OMEGA*dist*sqrt(NLO))-100.;
-// 										double prevres = 1.;
-// 										int xFieldSteps = 100, count = 0;
-// 										tmpfield[j] = -1.;
-// 										while( count < 2 || ABS(ASYM(tmpfield[j],prevres))>data.InternalAcc ){
-// 											count++; prevres = tmpfield[j]; xFieldSteps *= 2; if(xFieldSteps>maxFieldSteps) maxFieldSteps = xFieldSteps;
-// 											double deltax = (x1-x0)/((double)xFieldSteps); if((x1-x0)>maxdelta) maxdelta = x1-x0;
-// 											if(METHOD==0){
-// 												vector<double> xFrame = {{x0},{x1}}; vector<double> xField(xFieldSteps+1);
-// 												for(int k=0;k<xFieldSteps+1;k++){
-// 													double x = x0 + deltax*(double)k;
-// 													double k7 = LO-x*NLO;
-// 													if(k7>MP){
-// 														k7 = sqrt(k7);
-// 														double AI;
-// 														if(x>100.) AI = 0.;
-// 														else if(x>-300.) AI = gsl_sf_airy_Ai(x,GSL_PREC_DOUBLE);
-// 														else AI = cos(2.*(-x)*sqrt(-x)/3.-0.25*PI)/(SQRTPI*pow(-x,0.25));
-// 														xField[k] = AI*k7*gsl_sf_bessel_Jn(1,2.*dist*k7);
-// 													}
-// 													else xField[k] = 0.;
-// 												}
-// 												tmpfield[j] = Integrate(data.ompThreads,data.method, 1, xField, xFrame)/(2.*PI*dist);
-// 											}
-// 											else if(METHOD==1){
-// 												int NumMAXITER = 0;
-// 												tmpfield[j] = getn7AIintegral(x0,x1,STEPS,-1.0e-300,0,MAXITER,NumMAXITER,dist,LO,NLO,data);
-// 											}
-// 											if(xFieldSteps>MAXFIELDSTEPS/2) cout << "i = " << i << ": " << xFieldSteps << " x0=" << x0 << " x1=" << x1 << " tmpfield[" << j << "] = " << tmpfield[j] << " partialSum = " << partialSum << endl;
-// 											if( xFieldSteps>MAXFIELDSTEPS /*|| (count>10 && (ABS(tmpfield[j])<0.001*data.AverageDensity[s]/((double)data.GridSize)) )*/ ) break;
-// 										}
-// 									}
-// 									else if(METHOD==2){//integration with adaptive bisection
-// 										//double z0 = 1.25*PI;
-// 										double x0 = min(-100.,x1-2.*OMEGA*dist*sqrt(NLO))-100.;
-// 										double z0 = ceil(2.*dist*sqrt(NLO*(x1-x0))/(2.*PI))*2.*PI+1.25*PI;
-// 										double a = x1-z0*z0/alpha, b = x1, prevres;//to put z0 (eventually) onto a zero of the cosine that appears in the asymptotic form of BesselJ
-// 										int count = 0, successcount = 0;
-// 										while(successcount<3){
-// 											count++; prevres = tmpfield[j]; int NumMAXITER = 0;
-// 											tmpfield[j] += getn7AIintegral(a,b,STEPS,-1.0e-300,0,MAXITER,NumMAXITER,dist,LO,NLO,data);
-// 											z0 += 2.*PI/**(double)count*//**(int)(sqrt((double)count)+0.5)*/; b = a; a = x1-z0*z0/alpha;
-// 											if(ABS(ASYM(tmpfield[j],prevres))<TargetAcc || (ABS(tmpfield[j])<TEST && ABS(prevres)<TEST)) successcount++; else successcount = 0;
-// 											if(count==MAXCOUNT && ABS(ASYM(tmpfield[j],prevres))>TargetAcc){
-// 												cout << "MAXCOUNT insufficient @ i = " << i << ": LO=" << LO << " NLO=" << NLO << " a=" << a << " b=" << b << " Bessel@x0=" << gsl_sf_bessel_Jn(1,2.*dist*sqrt(POS(LO-a*NLO))) << " NumMAXITER(accumulated) = " << NumMAXITER << " successcount = " << successcount << " tmpfield[" << j << "] = " << tmpfield[j] << "(" << prevres << ")" << " asym=" << ABS(ASYM(tmpfield[j],prevres)) << endl;
-// 												//tmpfield[j] = 0.;
-// 											}
-// 											if(NumMAXITER>0){
-// 												//cout << "MAXITER insufficient @ i = " << i << ": LO=" << LO << " NLO=" << NLO << " a=" << a << " b=" << b << " Bessel@x0=" << gsl_sf_bessel_Jn(1,2.*dist*sqrt(POS(LO-a*NLO))) << " NumMAXITER(accumulated) = " << NumMAXITER << " successcount = " << successcount << " tmpfield[" << j << "] = " << tmpfield[j] << "(" << prevres << ")" << " asym=" << ABS(ASYM(tmpfield[j],prevres)) << endl;
-// 												//tmpfield[j] = 0.; break;
-// 											}
-// 											if(count==MAXCOUNT) break;
-// 										}
-// 										//cout << "final tmpfield(i,j)=(" << i << "," << j << ") == " << tmpfield[j] << " count = " << count << "/" << MAXCOUNT << endl;
-// 									}
-// 								}
-// 							}
-// 						}
-// 					}
-// 					data.Den[s][i] = data.degeneracy*Integrate(data.ompThreads,data.method, data.DIM, tmpfield, data.frame);
-// 					cout << "density[" << i << "] = " << data.Den[s][i] << endl;
-// 				}
-// 			}
-// 		}
 		MatrixToFile(data.TestMat,"TestMat.dat",16);
 	}
 	else if(METHOD>=3){//with KD
       	double prefactorA = 8./data.U, prefactorB = 4./pow(3.*data.U*data.U,1./3.);
-		COMPUTEKD.clear(); COMPUTEKD.resize(data.KD.CoarseGridSize);//points where the density is calculated
+        if(data.KD.UseTriangulation){
+          	COMPUTEKD.clear();
+            COMPUTEKD.resize(data.KD.CoarseGridSize);//points where the density is calculated
+        }
 		#pragma omp parallel for schedule(dynamic) if(data.ompThreads>1)
 		for(int c=0;c<data.KD.CoarseGridSize;c++){
+          	if(omp_get_thread_num()==0) PRINT("Getn7: FreeRAM2 = " + to_string_with_precision((double)getFreeRAM(data),5),data);
 			int FocalIndex = data.KD.CoarseIndices[c];
 			double ABSERR2, AverageRelERR = 0.;
 			vector<double> tmpfield(data.GridSize);
             vector<double> rVec(data.VecAt[FocalIndex]);
+            //if(omp_get_thread_num()==0) PRINT("Getn7: FreeRAM2a = " + to_string_with_precision((double)getFreeRAM(data),5),data);
 			for(int j=0;j<data.GridSize;j++){
-				COMPUTEKD[c].resize(data.GridSize);//grid over which KD is integrated
+				if(data.KD.UseTriangulation) COMPUTEKD[c].resize(data.GridSize);//grid over which KD is integrated
 				double dist2 = Norm2(VecDiff(rVec,data.VecAt[j]));
 				double A = prefactorA*dist2*(data.muVec[s]-data.V[s][FocalIndex]/3.-2.*data.V[s][j]/3.);
 				double B = prefactorB*dist2*pow(data.GradSquared[s][j],1./3.);
@@ -4368,10 +4283,13 @@ void Getn7(int s, datastruct &data){
 				}
 				else tmpfield[j] = GetID(tauThreshold,s,FocalIndex,Norm(rVec),FocalIndex,Norm(rVec),data);
 			}
+			//if(omp_get_thread_num()==0) PRINT("Getn7: FreeRAM2b = " + to_string_with_precision((double)getFreeRAM(data),5),data);
 			data.Den[s][FocalIndex] = data.degeneracy*Integrate(data.ompThreads,data.method, data.DIM, tmpfield, data.frame);
  			if(omp_get_thread_num()==0) PRINT("density[" + to_string(FocalIndex) + "] = " + to_string(data.Den[s][FocalIndex]),data);
         }
 	}
+
+	//if(omp_get_thread_num()==0) PRINT("Getn7: FreeRAM3 = " + to_string_with_precision((double)getFreeRAM(data),5),data);
   
 	data.FocalSpecies = s;
 	ExpandSymmetry(1,data.Den[s],data);
@@ -4404,6 +4322,8 @@ void Getn7(int s, datastruct &data){
         PRINT(data.KD.TriangulationReport,data);
         if(data.KD.IntermediateCleanUp) CleanUpTriangulation(data);
 	}
+
+	PRINT("Getn7: FreeRAM3 = " + to_string_with_precision((double)getFreeRAM(data),5),data);
 }
 
 void GetSCOdensity(int s, datastruct &data){
@@ -13081,13 +13001,30 @@ void ExportData(datastruct &data){
 }
 
 void CleanUp(datastruct &data){
-  if(data.FLAGS.LIBXC){
-    delete [] data.LIBXC_rho; data.LIBXC_rho = NULL; 
-    delete [] data.LIBXC_sigma; data.LIBXC_sigma = NULL;
-    delete [] data.LIBXC_exc; data.LIBXC_exc = NULL;
-    delete [] data.LIBXC_vxc; data.LIBXC_vxc = NULL;
-    delete [] data.LIBXC_vsigma; data.LIBXC_vsigma = NULL;
-  }
+  	if(data.FLAGS.LIBXC){
+    	delete [] data.LIBXC_rho; data.LIBXC_rho = NULL;
+    	delete [] data.LIBXC_sigma; data.LIBXC_sigma = NULL;
+    	delete [] data.LIBXC_exc; data.LIBXC_exc = NULL;
+    	delete [] data.LIBXC_vxc; data.LIBXC_vxc = NULL;
+    	delete [] data.LIBXC_vsigma; data.LIBXC_vsigma = NULL;
+  	}
+
+    if (data.FLAGS.FFTW){
+
+	    // 1) Destroy the two plans you created
+	    fftw_destroy_plan(data.FFTWPLANFORWARDPARALLEL);
+	    fftw_destroy_plan(data.FFTWPLANBACKWARDPARALLEL);
+
+	    // 2) Free the input/output buffers
+	    fftw_free(data.inFFTW);
+	    fftw_free(data.outFFTW);
+
+	    // 3) Tear down the threaded planner (if you called fftw_init_threads())
+	    fftw_cleanup_threads();
+
+	    // 4) Global cleanup: releases all other internal FFTW scratch buffers
+	    fftw_cleanup();
+    }
 }
 
 void StoreTASKdata(taskstruct &task, datastruct &data){

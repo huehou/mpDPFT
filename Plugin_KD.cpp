@@ -668,7 +668,7 @@ bool check_gaussian_profile(void *params){
 
     double stdev = 5.e-3;
     double peak = abs(fcontour(1.0, params));
-    double pi = 3.14159;
+    double pi = PI;
 
     double bound = peak * exp(-1/2);
 
@@ -898,7 +898,7 @@ double KD_contour(int D, double A, double B, KDintegrationParams &KDip){
         gsl_integration_workspace_free(workspace);
     }
 
-    double total_result = 2/3.14159 * result;
+    double total_result = 2./PI * result;
 
     return total_result;
 }

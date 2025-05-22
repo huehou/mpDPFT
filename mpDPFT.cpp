@@ -4173,8 +4173,6 @@ void Getn7(int s, datastruct &data){
 	DelField(data.V[s], s, data.DelFieldMethod, data);
     cout << "Getn7 derivatives computed" << endl;
 
-    PRINT("Getn7: FreeRAM1 = " + to_string_with_precision((double)getFreeRAM(data),5),data);
-
     double ABSERR;
 
 	if( data.Symmetry==1 || METHOD<3 ){
@@ -4251,12 +4249,10 @@ void Getn7(int s, datastruct &data){
         }
 		#pragma omp parallel for schedule(dynamic) if(data.ompThreads>1)
 		for(int c=0;c<data.KD.CoarseGridSize;c++){
-          	if(omp_get_thread_num()==0) PRINT("Getn7: FreeRAM2 = " + to_string_with_precision((double)getFreeRAM(data),5),data);
 			int FocalIndex = data.KD.CoarseIndices[c];
 			double ABSERR2, AverageRelERR = 0.;
 			vector<double> tmpfield(data.GridSize);
             vector<double> rVec(data.VecAt[FocalIndex]);
-            //if(omp_get_thread_num()==0) PRINT("Getn7: FreeRAM2a = " + to_string_with_precision((double)getFreeRAM(data),5),data);
 			for(int j=0;j<data.GridSize;j++){
 				if(data.KD.UseTriangulation) COMPUTEKD[c].resize(data.GridSize);//grid over which KD is integrated
 				double dist2 = Norm2(VecDiff(rVec,data.VecAt[j]));
@@ -4283,13 +4279,10 @@ void Getn7(int s, datastruct &data){
 				}
 				else tmpfield[j] = GetID(tauThreshold,s,FocalIndex,Norm(rVec),FocalIndex,Norm(rVec),data);
 			}
-			//if(omp_get_thread_num()==0) PRINT("Getn7: FreeRAM2b = " + to_string_with_precision((double)getFreeRAM(data),5),data);
 			data.Den[s][FocalIndex] = data.degeneracy*Integrate(data.ompThreads,data.method, data.DIM, tmpfield, data.frame);
  			if(omp_get_thread_num()==0) PRINT("density[" + to_string(FocalIndex) + "] = " + to_string(data.Den[s][FocalIndex]),data);
         }
 	}
-
-	//if(omp_get_thread_num()==0) PRINT("Getn7: FreeRAM3 = " + to_string_with_precision((double)getFreeRAM(data),5),data);
   
 	data.FocalSpecies = s;
 	ExpandSymmetry(1,data.Den[s],data);

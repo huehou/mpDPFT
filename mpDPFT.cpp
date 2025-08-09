@@ -1565,6 +1565,81 @@ void GetEnv(int s,datastruct &data){//omp-parallelized - careful about performan
       data.Env[s][i] = 0.5*(x*x+y*y+z*z);
     }
   }  
+
+  else if(data.Environments[s]==20){//isotropic Mexican hat potential (r^4)-mpp*(r^2)
+    #pragma omp parallel for schedule(dynamic)
+    for(int i = 0; i < data.GridSize; i++) data.Env[s][i] = pow(Norm2(data.VecAt[i]), 2.) - data.mpp[s]*Norm2(data.VecAt[i]);
+  }
+
+  else if(data.Environments[s]==21){//isotropic Disk potential with mpp radius
+    #pragma omp parallel for schedule(dynamic)
+      for(int i = 0; i < data.GridSize; i++){
+	if (Norm2(data.VecAt[i]) < data.mpp[s]){
+	  data.Env[s][i] = 0;
+	}
+	else {
+	  data.Env[s][i] = 1.0e7;
+	}
+      }
+  }
+
+  else if(data.Environments[s]==22){//Barbell potential O-O shape with mpp as bridge length
+    double bridge = data.mpp[s]; //The bridge length 
+    #pragma omp parallel for schedule(dynamic)
+    for(int i = 0; i < data.GridSize; i++)
+    {
+      if (data.VecAt[i][0] >= -bridge/2 && data.VecAt[i][0] <= bridge/2){// The bridge area
+        data.Env[s][i] = max(-10*exp(-pow((pow(data.VecAt[i][0]-1.-bridge/2.,2) + pow(data.VecAt[i][1], 2)), 2) + 2*(pow(data.VecAt[i][0]-1.-bridge/2.,2) + pow(data.VecAt[i][1], 2))) -10*exp(-pow((pow(data.VecAt[i][0]+1.+bridge/2.,2) + pow(data.VecAt[i][1], 2)), 2) + 2*(pow(data.VecAt[i][0]+1.+bridge/2.,2) + pow(data.VecAt[i][1], 2))) - 10*exp(-10*pow(data.VecAt[i][1],2) + 1), -10*exp(1));
+      }
+      else {// The ring area
+        data.Env[s][i] = -10*exp(-pow((pow(data.VecAt[i][0]-1.-bridge/2.,2) + pow(data.VecAt[i][1], 2)), 2) + 2*(pow(data.VecAt[i][0]-1.-bridge/2.,2) + pow(data.VecAt[i][1], 2))) -10*exp(-pow((pow(data.VecAt[i][0]+1.+bridge/2.,2) + pow(data.VecAt[i][1], 2)), 2) + 2*(pow(data.VecAt[i][0]+1.+bridge/2.,2) + pow(data.VecAt[i][1], 2)));
+      }
+    }
+  }
+
+  else if(data.Environments[s]==23){//Generalised barbell potential O-O with variable parameters
+    double r = 1.2; //The radius of the ring
+    double Rfourth = 1.12385; //The ring width
+    double Bsqrt = 0.3; //The bridge width
+    double V0 = 100.0; //The potential depth
+    double R = pow(Rfourth, 4); //For easy parameterisation in equation for ring width
+    double B = pow(Bsqrt, 2); //For easy parameterisation in equation for bridge width
+    double bridge = data.mpp[s]; //The bridge length is mpp in mpDPFT.input 
+    #pragma omp parallel for schedule(dynamic)
+    for(int i = 0; i < data.GridSize; i++)
+    {
+      if (data.VecAt[i][0] >= -bridge/2 && data.VecAt[i][0] <= bridge/2){// The bridge area
+        data.Env[s][i] = V0*max(-exp(-pow((bridge - 2*data.VecAt[i][0])*(bridge + 4*r - 2*data.VecAt[i][0]) + 4*pow(data.VecAt[i][1],2),2)/R) -exp(-pow((bridge + 2*data.VecAt[i][0])*(bridge + 4*r + 2*data.VecAt[i][0]) + 4*pow(data.VecAt[i][1],2),2)/R)  - exp(-pow(data.VecAt[i][1],2)/B), -1.0);
+      }
+      else {
+	data.Env[s][i] = V0*max(-exp(-pow((bridge - 2*data.VecAt[i][0])*(bridge + 4*r - 2*data.VecAt[i][0]) + 4*pow(data.VecAt[i][1],2),2)/R) -exp(-pow((bridge + 2*data.VecAt[i][0])*(bridge + 4*r + 2*data.VecAt[i][0]) + 4*pow(data.VecAt[i][1],2),2)/R), -1.0);
+      }
+    }
+  }
+
+  else if(data.Environments[s]==24){//Quartic ring potential
+    double D = data.mpp[s]; //mpp as width of the ring
+    double R = 1.0; //Radius of the ring
+    double V0 = 100.0; //Potential depth
+    double B = - V0*exp(-16/D*pow(R,4)); 
+    #pragma omp parallel for schedule(dynamic) if(data.ompThreads>1)
+    for(int i = 0; i < data.GridSize; i++)
+    {
+      data.Env[s][i] = (B+V0)/pow(R,4)*(Norm2(data.VecAt[i])*Norm2(data.VecAt[i]) - 2*Norm2(data.VecAt[i])*R*R);
+    }
+  }
+
+  else if(data.Environments[s]==25){//Gaussian ring potential
+    double D = data.mpp[s]; //Width of the ring
+    double R = 1.0; //Radius of the ring
+    double V0 = 100.0; //Potential depth
+    #pragma omp parallel for schedule(dynamic) if(data.ompThreads>1)
+    for(int i = 0; i < data.GridSize; i++)
+    {
+      data.Env[s][i] = -V0*exp(-16/D*pow((Norm2(data.VecAt[i])-R*R),2));
+    }
+  }
+
   else if(data.Environments[s]==30){
     int col, shift = 2, NumEnvParam = TASK.NumEnvParam;
     data.EnvAv[s] = 0.;
